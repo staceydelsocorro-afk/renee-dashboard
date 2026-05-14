@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Renée Marino — Live Social Media Dashboard</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #faf9f7;
+  color: #1a1a1a;
+  line-height: 1.5;
+  padding: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+header {
+  border-bottom: 2px solid #1a1a1a;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.title-block h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+.title-block .subtitle { font-size: 13px; color: #666; margin-top: 4px; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+button {
+  background: #1a1a1a; color: #faf9f7; border: none;
+  padding: 8px 14px; border-radius: 6px; font-size: 13px;
+  cursor: pointer; font-weight: 500;
+}
+button.secondary { background: transparent; color: #1a1a1a; border: 1px solid #1a1a1a; }
+button:hover { opacity: 0.85; }
+.save-indicator {
+  font-size: 11px; color: #1d9e75;
+  margin-top: 6px; width: 100%; text-align: right;
+  opacity: 0; transition: opacity 0.3s;
+}
+.save-indicator.show { opacity: 1; }
+
+[contenteditable] { outline: none; border-radius: 3px; transition: background 0.15s; }
+[contenteditable]:hover { background: #fff4d6; }
+[contenteditable]:focus { background: #fff4d6; box-shadow: 0 0 0 2px #f0c040; }
+.edit-hint {
+  font-size: 11px; color: #999;
+  margin-bottom: 16px; padding: 8px 12px;
+  background: #fff4d6; border-left: 3px solid #f0c040;
+  border-radius: 4px;
+}
+
+section { margin-bottom: 36px; }
+h2 {
+  font-size: 13px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px; color: #1a1a1a;
+  margin-bottom: 14px; padding-bottom: 6px;
+  border-bottom: 1px solid #e5e2dc;
+}
+
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.kpi { background: #fff; border: 1px solid #e5e2dc; border-radius: 10px; padding: 14px 16px; }
+.kpi .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.kpi .value { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+.kpi .sub { font-size: 11px; color: #888; margin-top: 4px; }
+.kpi .delta-up { color: #1d9e75; }
+.kpi .delta-down { color: #d85a30; }
+
+.platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.platform { background: #fff; border: 1px solid #e5e2dc; border-radius: 10px; padding: 12px 14px; border-left: 4px solid #ccc; }
+.platform.ig { border-left-color: #E1306C; }
+.platform.yt { border-left-color: #FF0000; }
+.platform.fb { border-left-color: #1877F2; }
+.platform.li { border-left-color: #0A66C2; }
+.platform.tw { border-left-color: #1DA1F2; }
+.platform .pname { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.platform .phandle { font-size: 11px; color: #888; margin-bottom: 8px; }
+.platform .pmetric { font-size: 11px; color: #666; margin-top: 4px; }
+.platform .pmetric strong { font-size: 18px; font-weight: 600; color: #1a1a1a; display: block; }
+
+.chart-wrap { background: #fff; border: 1px solid #e5e2dc; border-radius: 10px; padding: 16px; height: 320px; position: relative; }
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; }
+
+.compete-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.compete { background: #fff; border: 1px solid #e5e2dc; border-radius: 10px; padding: 14px 16px; border-top: 3px solid #7F77DD; }
+.compete.vinh { border-top-color: #1D9E75; }
+.compete.vanessa { border-top-color: #D85A30; }
+.compete .cname { font-size: 15px; font-weight: 600; }
+.compete .ctag { font-size: 11px; color: #666; margin-bottom: 12px; }
+.compete .crow { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12px; border-bottom: 1px solid #f0ede5; }
+.compete .crow:last-of-type { border-bottom: none; }
+.compete .crow .ck { color: #666; }
+.compete .crow .cv { font-weight: 600; }
+.compete .earn { font-size: 22px; font-weight: 600; margin-top: 10px; }
+.compete .note { font-size: 11px; margin-top: 4px; color: #666; }
+
+.tl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.tl { background: #fff; border: 1px solid #e5e2dc; border-radius: 10px; padding: 16px; border-top: 4px solid #ccc; }
+.tl.green { border-top-color: #1d9e75; }
+.tl.yellow { border-top-color: #f0c040; }
+.tl.red { border-top-color: #d85a30; }
+.tl h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.tl.green h3 { color: #1d9e75; }
+.tl.yellow h3 { color: #b88a00; }
+.tl.red h3 { color: #d85a30; }
+.tl .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.tl.green .dot { background: #1d9e75; }
+.tl.yellow .dot { background: #f0c040; }
+.tl.red .dot { background: #d85a30; }
+.tl ul { list-style: none; }
+.tl li { font-size: 12px; padding: 6px 0; border-bottom: 1px solid #f0ede5; line-height: 1.5; }
+.tl li:last-child { border-bottom: none; }
+
+.action-list { background: #fff; border: 1px solid #e5e2dc; border-radius: 10px; padding: 4px 0; }
+.action { display: flex; gap: 12px; padding: 14px 18px; border-bottom: 1px solid #f0ede5; align-items: flex-start; }
+.action:last-child { border-bottom: none; }
+.action input[type=checkbox] { margin-top: 4px; width: 18px; height: 18px; cursor: pointer; accent-color: #1d9e75; flex-shrink: 0; }
+.action.done .action-body { opacity: 0.5; text-decoration: line-through; }
+.action-body { flex: 1; }
+.action-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.action-desc { font-size: 12px; color: #555; line-height: 1.5; }
+
+.pattern-list { background: #fff; border: 1px solid #e5e2dc; border-radius: 10px; padding: 6px 0; }
+.pattern { padding: 12px 18px; border-bottom: 1px solid #f0ede5; }
+.pattern:last-child { border-bottom: none; }
+.pattern .ptitle { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.pattern .pbody { font-size: 12px; color: #555; line-height: 1.5; }
+
+.notes { background: #fff4d6; border: 1px solid #f0c040; border-radius: 10px; padding: 14px 18px; min-height: 80px; font-size: 13px; line-height: 1.6; }
+.notes-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #b88a00; font-weight: 600; margin-bottom: 6px; }
+
+/* ============= 90-DAY CALENDAR ============= */
+.cal-intro {
+  background: #fff; border: 1px solid #e5e2dc; border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 14px; font-size: 13px; color: #444; line-height: 1.6;
+}
+.cal-intro strong { color: #1a1a1a; }
+.cal-roles {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;
+  font-size: 12px;
+}
+.role-card { padding: 10px 12px; border-radius: 8px; }
+.role-card.renee { background: #e9e8fb; border-left: 3px solid #7F77DD; }
+.role-card.stacey { background: #f0f0eb; border-left: 3px solid #888; }
+.role-card .rname { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.role-card.renee .rname { color: #5448b8; }
+.role-card.stacey .rname { color: #555; }
+
+.cal-tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.cal-tab {
+  background: #fff; border: 1px solid #e5e2dc; border-radius: 8px;
+  padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+  color: #555;
+}
+.cal-tab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.cal-tab:hover:not(.active) { background: #f4f1eb; }
+
+.cal-legend {
+  background: #fff; border: 1px solid #e5e2dc; border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 12px;
+  display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 11px; color: #555;
+}
+.cal-legend .lg { display: flex; align-items: center; gap: 5px; }
+.cal-legend .ldot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.cal-legend .obadge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px;
+}
+.cal-legend .obadge.r { background: #7F77DD; color: #fff; }
+.cal-legend .obadge.s { background: #555; color: #fff; }
+
+.month {
+  background: #fff; border: 1px solid #e5e2dc; border-radius: 12px;
+  padding: 14px; margin-bottom: 14px;
+}
+.month-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.month-head h3 { font-size: 16px; font-weight: 600; }
+.month-stats { font-size: 11px; color: #777; }
+.cal-dow {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: #888; padding: 0 2px 6px; font-weight: 600;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.day {
+  background: #faf9f7; border: 1px solid #ecebe5; border-radius: 6px;
+  min-height: 110px; padding: 6px; font-size: 11px;
+  display: flex; flex-direction: column; gap: 3px;
+  position: relative;
+}
+.day.empty { background: transparent; border-color: transparent; }
+.day.today { background: #fff4d6; border-color: #f0c040; box-shadow: inset 0 0 0 1px #f0c040; }
+.day.weekend { background: #f4f1eb; }
+.day.drag-over { background: #e0f5ee; border-color: #1d9e75; border-style: dashed; }
+.day-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; color: #666; font-weight: 600;
+}
+.day.today .day-head { color: #b88a00; }
+.day-add {
+  background: transparent; color: #888; border: none;
+  padding: 0; font-size: 14px; line-height: 1; cursor: pointer;
+  width: 16px; height: 16px; border-radius: 3px;
+}
+.day-add:hover { background: #1a1a1a; color: #fff; }
+.day-items { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+
+.cal-item {
+  background: #fff; border-left: 3px solid #888;
+  padding: 3px 5px 3px 6px; border-radius: 3px;
+  font-size: 10.5px; line-height: 1.3;
+  cursor: grab; display: flex; align-items: flex-start; gap: 3px;
+  position: relative;
+}
+.cal-item:active { cursor: grabbing; }
+.cal-item.t-video { border-left-color: #7F77DD; background: #f1eff9; }
+.cal-item.t-thumbnail { border-left-color: #E1306C; background: #fae6ef; }
+.cal-item.t-pdf { border-left-color: #1D9E75; background: #e6f5ee; }
+.cal-item.t-landing { border-left-color: #D85A30; background: #faebe2; }
+.cal-item.t-post { border-left-color: #0A66C2; background: #e3edf9; }
+.cal-item.t-email { border-left-color: #f0c040; background: #fcf3d6; }
+.cal-item.t-review { border-left-color: #888; background: #f0efea; }
+.cal-item .ititle {
+  flex: 1; outline: none; font-weight: 500; color: #1a1a1a;
+  word-break: break-word; min-width: 0;
+}
+.cal-item .ititle:focus { background: #fff; box-shadow: 0 0 0 1px #f0c040; }
+.cal-item .ibadge {
+  font-size: 8.5px; font-weight: 700; padding: 0 4px; border-radius: 2px;
+  color: #fff; flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  letter-spacing: 0.3px;
+}
+.cal-item .ibadge.r { background: #7F77DD; }
+.cal-item .ibadge.s { background: #555; }
+.cal-item .iremove {
+  font-size: 11px; color: #aaa; cursor: pointer; flex-shrink: 0;
+  width: 12px; height: 12px; line-height: 12px; text-align: center;
+  border-radius: 2px; margin-top: 1px;
+}
+.cal-item:hover .iremove { color: #d85a30; }
+.cal-item .iremove:hover { background: #d85a30; color: #fff; }
+.cal-item.dragging { opacity: 0.4; }
+
+/* Add-item inline form */
+.day-form {
+  background: #fff; border: 1px solid #1a1a1a; border-radius: 5px;
+  padding: 5px; display: flex; flex-direction: column; gap: 4px;
+  margin-top: 3px;
+}
+.day-form input, .day-form select {
+  font-size: 11px; padding: 3px 5px; border: 1px solid #ddd;
+  border-radius: 3px; width: 100%; font-family: inherit;
+}
+.day-form input:focus, .day-form select:focus { outline: none; border-color: #1a1a1a; }
+.day-form .row { display: flex; gap: 4px; }
+.day-form .row select { flex: 1; }
+.day-form .row button {
+  padding: 3px 6px; font-size: 10px; flex: 1;
+}
+
+/* Month phase strip */
+.phase-strip {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  margin-bottom: 12px;
+}
+.phase {
+  background: #fff; border: 1px solid #e5e2dc; border-radius: 8px;
+  padding: 10px 12px; border-top: 3px solid #7F77DD;
+}
+.phase.p2 { border-top-color: #1D9E75; }
+.phase.p3 { border-top-color: #D85A30; }
+.phase .ph-name { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; font-weight: 600; }
+.phase .ph-month { font-size: 14px; font-weight: 600; margin: 2px 0; }
+.phase .ph-goal { font-size: 11px; color: #555; line-height: 1.4; }
+
+footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e2dc; font-size: 11px; color: #888; text-align: center; }
+
+@media print {
+  body { background: #fff; padding: 0; max-width: none; }
+  .controls, .edit-hint, .save-indicator, .day-add, .iremove { display: none !important; }
+  .chart-wrap { break-inside: avoid; }
+  section { break-inside: avoid; }
+  .cal-tab { display: none; }
+  .cal-tab.print-all { display: inline-block; }
+  .month { break-inside: avoid; page-break-inside: avoid; }
+}
+@media (max-width: 700px) {
+  body { padding: 14px; }
+  .title-block h1 { font-size: 20px; }
+  .kpi .value { font-size: 19px; }
+  .day { min-height: 70px; font-size: 10px; }
+  .cal-item { font-size: 9.5px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>Renée Marino — Social Media Dashboard</h1>
+    <div class="subtitle">
+      Period: <span contenteditable="true" data-key="period">May 2026</span> · Prepared for <span contenteditable="true" data-key="prepared-for">Renée</span> · Last updated: <span id="lastUpdated">—</span>
+    </div>
+  </div>
+  <div class="controls">
+    <button onclick="window.print()">Print / PDF</button>
+    <button class="secondary" onclick="exportJSON()">Export data</button>
+    <button class="secondary" onclick="resetDashboard()">Reset</button>
+    <div class="save-indicator" id="saveIndicator">Saved</div>
+  </div>
+</header>
+
+<div class="edit-hint">
+  <strong>Tip:</strong> Every piece of text is editable — click any heading, label, number, list item, role card, legend entry, or footer line to rewrite it. In the 90-day plan, drag items between days, click + to add, click × to remove, click R/S to switch owner, double-click an item to change its type. All changes save automatically in your browser.
+</div>
+
+<section>
+  <h2>1. Executive Overview</h2>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Total Reach</div><div class="value"><span contenteditable="true" data-key="kpi-reach">49,693</span></div><div class="sub">across 5 platforms</div></div>
+    <div class="kpi"><div class="label">YouTube Views</div><div class="value"><span contenteditable="true" data-key="kpi-yt-views">3.2M</span></div><div class="sub delta-up">▲ <span contenteditable="true" data-key="kpi-yt-views-change">+49%</span></div></div>
+    <div class="kpi"><div class="label">IG Engagement</div><div class="value"><span contenteditable="true" data-key="kpi-ig-eng">1.65%</span></div><div class="sub">Target: <span contenteditable="true" data-key="kpi-ig-target">2.5%</span> by Aug</div></div>
+    <div class="kpi"><div class="label">YT Monetization</div><div class="value">$<span contenteditable="true" data-key="kpi-yt-earn">149</span></div><div class="sub delta-down">/ mo · peer avg ~$12,250</div></div>
+    <div class="kpi"><div class="label">Content Score</div><div class="value"><span contenteditable="true" data-key="kpi-score">34</span>/50</div><div class="sub">needs revision</div></div>
+    <div class="kpi"><div class="label">Revenue Streams</div><div class="value"><span contenteditable="true" data-key="kpi-streams">5+</span></div><div class="sub">vs. Vanessa 10+</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Platform Footprint</h2>
+  <div class="platform-grid">
+    <div class="platform ig"><div class="pname">Instagram</div><div class="phandle">@iamreneemarino</div><div class="pmetric"><strong contenteditable="true" data-key="ig-followers">18,400</strong>followers</div><div class="pmetric">Posts: <span contenteditable="true" data-key="ig-posts">2,289</span></div></div>
+    <div class="platform yt"><div class="pname">YouTube</div><div class="phandle">@iamreneemarino</div><div class="pmetric"><strong contenteditable="true" data-key="yt-subs">15,300</strong>subscribers</div><div class="pmetric">Videos: <span contenteditable="true" data-key="yt-videos">250</span></div></div>
+    <div class="platform fb"><div class="pname">Facebook</div><div class="phandle">@IamReneeMarino</div><div class="pmetric"><strong contenteditable="true" data-key="fb-followers">8,800</strong>followers</div></div>
+    <div class="platform li"><div class="pname">LinkedIn</div><div class="phandle">/in/réneemarino</div><div class="pmetric"><strong contenteditable="true" data-key="li-followers">5,093</strong>followers</div><div class="pmetric">Keynote leverage</div></div>
+    <div class="platform tw"><div class="pname">Twitter / X</div><div class="phandle">@ReneeMarino</div><div class="pmetric"><strong contenteditable="true" data-key="tw-followers">2,096</strong>followers</div></div>
+  </div>
+
+  <div style="margin-top:14px" class="chart-grid">
+    <div class="chart-wrap"><canvas id="chartFollowers"></canvas></div>
+    <div class="chart-wrap"><canvas id="chartGrowth"></canvas></div>
+  </div>
+</section>
+
+<section>
+  <h2>2. Competitive Landscape</h2>
+  <div class="compete-grid">
+    <div class="compete">
+      <div class="cname">Renée Marino</div><div class="ctag">Everything Starts with Communication</div>
+      <div class="crow"><span class="ck">YT subs</span><span class="cv">15.3K</span></div>
+      <div class="crow"><span class="ck">YT views</span><span class="cv" style="color:#1d9e75">3.2M ▲+49%</span></div>
+      <div class="crow"><span class="ck">Shorts / wk</span><span class="cv">5</span></div>
+      <div class="crow"><span class="ck">Longform / wk</span><span class="cv" style="color:#d85a30">0</span></div>
+      <div class="crow"><span class="ck">Revenue streams</span><span class="cv">5+</span></div>
+      <div class="earn" style="color:#7F77DD">$149/mo</div>
+      <div class="note" style="color:#d85a30">Views growing — subs not converting</div>
+    </div>
+    <div class="compete vinh">
+      <div class="cname">Vinh Giang</div><div class="ctag">Unlock Your Potential through Masterful Communication</div>
+      <div class="crow"><span class="ck">YT subs</span><span class="cv">4.49M</span></div>
+      <div class="crow"><span class="ck">YT views</span><span class="cv" style="color:#1d9e75">676M ▲+49%</span></div>
+      <div class="crow"><span class="ck">Shorts / wk</span><span class="cv">5</span></div>
+      <div class="crow"><span class="ck">Longform / wk</span><span class="cv" style="color:#1d9e75">1</span></div>
+      <div class="crow"><span class="ck">Revenue streams</span><span class="cv">5+</span></div>
+      <div class="earn" style="color:#1d9e75">$9,500/mo</div>
+      <div class="note" style="color:#1d9e75">Same shorts volume — longform is the gap</div>
+    </div>
+    <div class="compete vanessa">
+      <div class="cname">Vanessa Edwards</div><div class="ctag">Body Language &amp; Feedback</div>
+      <div class="crow"><span class="ck">YT subs</span><span class="cv">1.21M</span></div>
+      <div class="crow"><span class="ck">YT views</span><span class="cv" style="color:#d85a30">87.6M ▼-31%</span></div>
+      <div class="crow"><span class="ck">Shorts / wk</span><span class="cv">7</span></div>
+      <div class="crow"><span class="ck">Longform / wk</span><span class="cv">0.1</span></div>
+      <div class="crow"><span class="ck">Revenue streams</span><span class="cv" style="color:#1d9e75">10+</span></div>
+      <div class="earn" style="color:#d85a30">$15,000/mo</div>
+      <div class="note" style="color:#d85a30">Views declining — over-indexed on shorts</div>
+    </div>
+  </div>
+  <div style="margin-top:14px" class="chart-grid">
+    <div class="chart-wrap"><canvas id="chartEarnings"></canvas></div>
+    <div class="chart-wrap"><canvas id="chartCadence"></canvas></div>
+  </div>
+</section>
+
+<section>
+  <h2>3. Viral Pattern Identification</h2>
+  <div class="pattern-list">
+    <div class="pattern"><div class="ptitle" contenteditable="true" data-key="pat1-title">5 shorts / week is the growth floor</div><div class="pbody" contenteditable="true" data-key="pat1-body">Same cadence Vinh Giang ran to reach 4.49M subs. Renée's matching this — and seeing the +49% YouTube lift to prove it. Maintain. Do not reduce.</div></div>
+    <div class="pattern"><div class="ptitle" contenteditable="true" data-key="pat2-title">Communication-skills niche beats "presence/aesthetic"</div><div class="pbody" contenteditable="true" data-key="pat2-body">Renée and Vinh, both anchored in communication, are at +49%. Vanessa drifted into body language and dropped to -31%. The audience signal favors skill-based framing over personality framing.</div></div>
+    <div class="pattern"><div class="ptitle" contenteditable="true" data-key="pat3-title">Shorts-only ceiling exists at ~1.2M subs</div><div class="pbody" contenteditable="true" data-key="pat3-body">Vanessa runs 7 shorts/wk + barely any longform → -31% view decline. The ceiling is real. Longform is what breaks it.</div></div>
+    <div class="pattern"><div class="ptitle" contenteditable="true" data-key="pat4-title">"Share in the comments" + 3-item lists are the failure pattern</div><div class="pbody" contenteditable="true" data-key="pat4-body">Explicitly flagged in the May 30 Glamour Grit revision: cut 3-item lists, replace "share in the comments" with one specific, answerable question.</div></div>
+    <div class="pattern"><div class="ptitle" contenteditable="true" data-key="pat5-title">Platform breadth is a strength — depth is the gap</div><div class="pbody" contenteditable="true" data-key="pat5-body">Platform diversity scored 8/10 (highest of any metric). Don't add a sixth channel — go deeper on YouTube and LinkedIn.</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>4. Metric Traffic Lights</h2>
+  <div class="tl-grid">
+    <div class="tl green">
+      <h3><span class="dot"></span>Green — Keep doing</h3>
+      <ul>
+        <li><strong>YouTube Shorts cadence (5/wk)</strong> — driving +49% view growth</li>
+        <li><strong>Instagram base (18.4K)</strong> — largest single asset, foundation</li>
+        <li><strong>Communication niche framing</strong> — the only direction still trending up</li>
+        <li><strong>Platform diversity (8/10)</strong> — leave alone; focus elsewhere</li>
+      </ul>
+    </div>
+    <div class="tl yellow">
+      <h3><span class="dot"></span>Yellow — Iterate</h3>
+      <ul>
+        <li><strong>IG engagement 1.65%</strong> → defined path to 2.5% by Aug via caption rewrites</li>
+        <li><strong>Facebook 8.8K</strong> — present but not driving outcomes</li>
+        <li><strong>Twitter/X 2.1K</strong> — smallest footprint; iterate or sunset</li>
+        <li><strong>Content score 34/50</strong> — revisions identified</li>
+      </ul>
+    </div>
+    <div class="tl red">
+      <h3><span class="dot"></span>Red — Pivot or drop</h3>
+      <ul>
+        <li><strong>YouTube longform 0/wk</strong> — single largest revenue gap</li>
+        <li><strong>YT earnings $149/mo</strong> — 98% below peer average</li>
+        <li><strong>LinkedIn dormant</strong> — 5,093 high-intent followers</li>
+        <li><strong>No UTM tracking</strong> — flying blind on attribution</li>
+        <li><strong>"Share in the comments" CTA</strong> — replace immediately</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>5. Next Week's Action Plan</h2>
+  <div class="action-list" id="actionList">
+    <div class="action"><input type="checkbox" data-action="a1"><div class="action-body"><div class="action-title" contenteditable="true">1. Ship first longform YouTube video (12–18 min) by Friday</div><div class="action-desc" contenteditable="true">Working title: "The 3 Sentences That Made Me a Better Speaker Than 10 Years of Practice." Speak-to-camera, no B-roll dependency.</div></div></div>
+    <div class="action"><input type="checkbox" data-action="a2"><div class="action-body"><div class="action-title" contenteditable="true">2. Rewrite May 30 Glamour Grit captions</div><div class="action-desc" contenteditable="true">Remove every 3-item list. Replace "share in the comments" with one specific question. Cut parallel phrasing in opening lines.</div></div></div>
+    <div class="action"><input type="checkbox" data-action="a3"><div class="action-body"><div class="action-title" contenteditable="true">3. Activate LinkedIn — one keynote-positioning post Tuesday</div><div class="action-desc" contenteditable="true">Hook: "I've worked with executives whose slides are flawless and whose first 30 seconds on stage still fall apart."</div></div></div>
+    <div class="action"><input type="checkbox" data-action="a4"><div class="action-body"><div class="action-title" contenteditable="true">4. Add UTM links to every bio (Monday)</div><div class="action-desc" contenteditable="true">One UTM per platform. Pipe into GA4 or Linktree analytics.</div></div></div>
+    <div class="action"><input type="checkbox" data-action="a5"><div class="action-body"><div class="action-title" contenteditable="true">5. Test a "specific number, specific moment" hook short</div><div class="action-desc" contenteditable="true">Hook template: "At minute 14 of my last keynote, the room went silent. Here's what I'd just said."</div></div></div>
+  </div>
+</section>
+
+<!-- ============= 6. 90-DAY PLAN ============= -->
+<section>
+  <h2>6. 90-Day Plan — Stacey produces, Renée delivers</h2>
+
+  <div class="cal-intro">
+    <strong>How to read this:</strong> Each item is one piece of work on one day. The colored stripe shows the type (video, thumbnail, PDF, landing page, social post, email, or review). The badge shows who owns it — <span class="cal-legend"><span class="obadge r" style="padding:1px 5px">R</span></span> for Renée (talent / record / approve) or <span class="cal-legend"><span class="obadge s" style="padding:1px 5px">S</span></span> for Stacey (produce / edit / design / publish).
+    <div class="cal-roles">
+      <div class="role-card renee">
+        <div class="rname">Renée</div>
+        Speaks on camera. Records longform + shorts. Writes hooks. Approves thumbnails &amp; PDFs. Pushes LinkedIn posts personally. Holds the keynote-pipeline calls.
+      </div>
+      <div class="role-card stacey">
+        <div class="rname">Stacey — strategist + producer</div>
+        Edits videos. Designs thumbnails. Builds PDFs / lead magnets. Builds landing pages. Schedules posts. Delivers <strong>1 longform + 5 shorts</strong> every week. Reports results back to Renée.
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-strip">
+    <div class="phase p1">
+      <div class="ph-name">Phase 1 · Foundation</div>
+      <div class="ph-month">May 2026</div>
+      <div class="ph-goal">First longform shipped. "50 Things Never to Say" PDF drafted. LinkedIn activated. UTM tracking live. IG engagement → 1.85%.</div>
+    </div>
+    <div class="phase p2">
+      <div class="ph-name">Phase 2 · Acceleration</div>
+      <div class="ph-month">June 2026</div>
+      <div class="ph-goal">4 longforms shipped. PDF landing page live. Masterclass page drafted. First sponsor outreach. IG engagement → 2.0%.</div>
+    </div>
+    <div class="phase p3">
+      <div class="ph-name">Phase 3 · Conversion</div>
+      <div class="ph-month">July 2026</div>
+      <div class="ph-goal">Masterclass launched. 4 longforms shipped. First sponsor deal closed or 1st masterclass cohort. IG engagement → 2.5%.</div>
+    </div>
+  </div>
+
+  <div class="cal-legend">
+    <span class="lg"><span class="ldot" style="background:#7F77DD"></span>Video / longform</span>
+    <span class="lg"><span class="ldot" style="background:#E1306C"></span>Thumbnail</span>
+    <span class="lg"><span class="ldot" style="background:#1D9E75"></span>PDF / lead magnet</span>
+    <span class="lg"><span class="ldot" style="background:#D85A30"></span>Landing page</span>
+    <span class="lg"><span class="ldot" style="background:#0A66C2"></span>Social post</span>
+    <span class="lg"><span class="ldot" style="background:#f0c040"></span>Email / newsletter</span>
+    <span class="lg"><span class="ldot" style="background:#888"></span>Review / decision</span>
+    <span class="lg" style="margin-left:auto"><span class="obadge r">R</span> Renée</span>
+    <span class="lg"><span class="obadge s">S</span> Stacey</span>
+  </div>
+
+  <div class="cal-tabs" id="calTabs">
+    <button class="cal-tab" data-month="2026-05">May 2026</button>
+    <button class="cal-tab" data-month="2026-06">June 2026</button>
+    <button class="cal-tab" data-month="2026-07">July 2026</button>
+    <button class="cal-tab secondary" onclick="addBlankItem()" style="margin-left:auto">+ Add to today</button>
+  </div>
+
+  <div id="calendar"></div>
+</section>
+
+<section>
+  <h2>Notes &amp; observations</h2>
+  <div class="notes" contenteditable="true" data-key="notes">
+    <div class="notes-label">Write anything here — feedback, context, blockers</div>
+    Editor obstacle: Fiverr editors holding up shorts production. Mitigation = speak-to-camera longform that doesn't require editing. Travel: build a 2-shorts-ahead buffer on Sundays. Stacey owns thumbnail batches on Tuesdays.
+  </div>
+</section>
+
+<footer>
+  Data source: Renée Marino competitive analysis · May 2026. Edits save to local browser. Use Export to share a snapshot.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<script>
+const STORE_KEY = 'reneeDashboardV2';
+
+// ============= GENERIC DASHBOARD STATE =============
+function loadState() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+    document.querySelectorAll('[contenteditable][data-key]').forEach(el => {
+      if (data.fields && data.fields[el.dataset.key] != null) el.innerHTML = data.fields[el.dataset.key];
+    });
+    if (data.actions) {
+      const titles = document.querySelectorAll('.action .action-title');
+      const descs = document.querySelectorAll('.action .action-desc');
+      data.actions.forEach((a, i) => {
+        if (a.title != null && titles[i]) titles[i].innerHTML = a.title;
+        if (a.desc != null && descs[i]) descs[i].innerHTML = a.desc;
+        if (a.done != null) {
+          const cb = document.querySelector('[data-action="a' + (i+1) + '"]');
+          if (cb) { cb.checked = a.done; cb.closest('.action').classList.toggle('done', a.done); }
+        }
+      });
+    }
+    if (data.calItems) calState.items = data.calItems;
+    if (data.activeMonth) calState.activeMonth = data.activeMonth;
+    if (data.lastUpdated) document.getElementById('lastUpdated').textContent = data.lastUpdated;
+  } catch (e) { console.warn('Load failed', e); }
+}
+
+function saveState() {
+  const fields = {};
+  document.querySelectorAll('[contenteditable][data-key]').forEach(el => { fields[el.dataset.key] = el.innerHTML; });
+  const actions = [];
+  const titles = document.querySelectorAll('.action .action-title');
+  const descs = document.querySelectorAll('.action .action-desc');
+  document.querySelectorAll('[data-action]').forEach((cb, i) => {
+    actions.push({
+      title: titles[i] ? titles[i].innerHTML : '',
+      desc: descs[i] ? descs[i].innerHTML : '',
+      done: cb.checked
+    });
+  });
+  const now = new Date().toLocaleString();
+  document.getElementById('lastUpdated').textContent = now;
+  localStorage.setItem(STORE_KEY, JSON.stringify({
+    fields, actions,
+    calItems: calState.items,
+    activeMonth: calState.activeMonth,
+    lastUpdated: now
+  }));
+  showSaved();
+}
+
+let saveTimer = null;
+function debouncedSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveState, 400); }
+function showSaved() {
+  const ind = document.getElementById('saveIndicator');
+  ind.classList.add('show');
+  clearTimeout(showSaved.t);
+  showSaved.t = setTimeout(() => ind.classList.remove('show'), 1200);
+}
+
+function resetDashboard() {
+  if (!confirm('Reset all edits to the original dashboard? This will erase any custom items you added to the 90-day calendar.')) return;
+  localStorage.removeItem(STORE_KEY);
+  location.reload();
+}
+
+function exportJSON() {
+  const data = localStorage.getItem(STORE_KEY) || '{}';
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'renee-dashboard-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============= 90-DAY CALENDAR =============
+const calState = {
+  activeMonth: '2026-05',
+  items: getSeedItems()
+};
+
+function getSeedItems() {
+  // 90-day seed plan: May → July 2026
+  // type: video | thumbnail | pdf | landing | post | email | review
+  // owner: R | S
+  return [
+    // ===== MAY 2026 - Foundation =====
+    { id: id(), date: '2026-05-15', type: 'video',    owner: 'R', title: 'Record longform #1: "3 Sentences That Made Me a Better Speaker"' },
+    { id: id(), date: '2026-05-15', type: 'post',     owner: 'R', title: 'LinkedIn: keynote-positioning post (Tue hook)' },
+    { id: id(), date: '2026-05-18', type: 'video',    owner: 'S', title: 'Edit longform #1 + chapters' },
+    { id: id(), date: '2026-05-18', type: 'pdf',      owner: 'S', title: 'Draft "50 Things Never to Say" — outline + voice samples from Renée' },
+    { id: id(), date: '2026-05-19', type: 'thumbnail',owner: 'S', title: 'Thumbnail batch: longform #1 + 5 shorts' },
+    { id: id(), date: '2026-05-20', type: 'video',    owner: 'R', title: 'Record 5 shorts batch (Wed studio block)' },
+    { id: id(), date: '2026-05-21', type: 'video',    owner: 'S', title: 'Publish longform #1 on YouTube' },
+    { id: id(), date: '2026-05-22', type: 'review',   owner: 'R', title: 'Review "50 Things Never to Say" draft' },
+    { id: id(), date: '2026-05-25', type: 'landing',  owner: 'S', title: 'Wireframe landing page: "50 Things Never to Say"' },
+    { id: id(), date: '2026-05-26', type: 'post',     owner: 'S', title: 'Add UTM links to all 5 bio links' },
+    { id: id(), date: '2026-05-27', type: 'pdf',      owner: 'S', title: '"50 Things Never to Say" — design + layout' },
+    { id: id(), date: '2026-05-28', type: 'video',    owner: 'R', title: 'Record longform #2 script' },
+    { id: id(), date: '2026-05-29', type: 'thumbnail',owner: 'S', title: 'Thumbnail batch: week 2 shorts' },
+    { id: id(), date: '2026-05-30', type: 'post',     owner: 'R', title: 'Glamour Grit caption rewrites — kill 3-item lists' },
+    { id: id(), date: '2026-05-30', type: 'landing',  owner: 'S', title: 'Landing page v1 built (preview to Renée)' },
+    { id: id(), date: '2026-05-31', type: 'review',   owner: 'R', title: 'Phase 1 review — IG engagement, longform #1 metrics' },
+
+    // ===== JUNE 2026 - Acceleration =====
+    { id: id(), date: '2026-06-01', type: 'landing',  owner: 'S', title: 'LIVE: "50 Things Never to Say" landing page' },
+    { id: id(), date: '2026-06-01', type: 'pdf',      owner: 'S', title: 'PDF lead magnet shipping live' },
+    { id: id(), date: '2026-06-02', type: 'email',    owner: 'S', title: 'Welcome email sequence (3 emails) wired to PDF opt-in' },
+    { id: id(), date: '2026-06-03', type: 'video',    owner: 'S', title: 'Edit + publish longform #2' },
+    { id: id(), date: '2026-06-04', type: 'thumbnail',owner: 'S', title: 'Thumbnail A/B test: longform #2' },
+    { id: id(), date: '2026-06-05', type: 'post',     owner: 'R', title: 'LinkedIn — announce "50 Things" PDF + tag 3 keynote prospects' },
+    { id: id(), date: '2026-06-08', type: 'video',    owner: 'R', title: 'Record longform #3 + 5 shorts' },
+    { id: id(), date: '2026-06-10', type: 'video',    owner: 'S', title: 'Edit + publish longform #3' },
+    { id: id(), date: '2026-06-12', type: 'email',    owner: 'R', title: 'Send first sponsorship outreach (3 brands)' },
+    { id: id(), date: '2026-06-15', type: 'post',     owner: 'R', title: 'LinkedIn newsletter — launch issue #1' },
+    { id: id(), date: '2026-06-15', type: 'video',    owner: 'R', title: 'Record longform #4 + shorts batch' },
+    { id: id(), date: '2026-06-17', type: 'video',    owner: 'S', title: 'Edit + publish longform #4' },
+    { id: id(), date: '2026-06-18', type: 'thumbnail',owner: 'S', title: 'Thumbnail batch: week 4 shorts' },
+    { id: id(), date: '2026-06-22', type: 'landing',  owner: 'S', title: 'Wireframe: Masterclass landing page' },
+    { id: id(), date: '2026-06-23', type: 'video',    owner: 'R', title: 'Record longform #5 + masterclass teaser' },
+    { id: id(), date: '2026-06-24', type: 'video',    owner: 'S', title: 'Edit + publish longform #5' },
+    { id: id(), date: '2026-06-26', type: 'pdf',      owner: 'S', title: 'Lead magnet #2: "Speaker Prep Checklist" — draft' },
+    { id: id(), date: '2026-06-29', type: 'landing',  owner: 'S', title: 'Masterclass landing page v1 (preview)' },
+    { id: id(), date: '2026-06-30', type: 'review',   owner: 'R', title: 'Phase 2 review — IG engagement target 2.0%, PDF opt-in rate' },
+
+    // ===== JULY 2026 - Conversion =====
+    { id: id(), date: '2026-07-01', type: 'landing',  owner: 'S', title: 'LIVE: Masterclass landing page + checkout' },
+    { id: id(), date: '2026-07-02', type: 'email',    owner: 'S', title: 'Masterclass announcement email to full list' },
+    { id: id(), date: '2026-07-03', type: 'post',     owner: 'R', title: 'LinkedIn + IG: masterclass launch posts' },
+    { id: id(), date: '2026-07-06', type: 'video',    owner: 'R', title: 'Record longform #6 (masterclass promo) + shorts' },
+    { id: id(), date: '2026-07-07', type: 'video',    owner: 'R', title: 'First masterclass cohort session — Renée delivers' },
+    { id: id(), date: '2026-07-08', type: 'video',    owner: 'S', title: 'Edit + publish longform #6' },
+    { id: id(), date: '2026-07-09', type: 'thumbnail',owner: 'S', title: 'Thumbnail batch: masterclass promo shorts' },
+    { id: id(), date: '2026-07-13', type: 'video',    owner: 'R', title: 'Record longform #7 + shorts batch' },
+    { id: id(), date: '2026-07-15', type: 'video',    owner: 'S', title: 'Edit + publish longform #7' },
+    { id: id(), date: '2026-07-17', type: 'email',    owner: 'R', title: 'Sponsor outreach round 2 (5 brands)' },
+    { id: id(), date: '2026-07-20', type: 'video',    owner: 'R', title: 'Record longform #8 + shorts batch' },
+    { id: id(), date: '2026-07-22', type: 'video',    owner: 'S', title: 'Edit + publish longform #8' },
+    { id: id(), date: '2026-07-23', type: 'pdf',      owner: 'S', title: 'Lead magnet #3: "Stage Fright Reset" worksheet' },
+    { id: id(), date: '2026-07-27', type: 'video',    owner: 'R', title: 'Record longform #9 + shorts batch' },
+    { id: id(), date: '2026-07-29', type: 'video',    owner: 'S', title: 'Edit + publish longform #9' },
+    { id: id(), date: '2026-07-30', type: 'review',   owner: 'R', title: '90-day review: IG 2.5% target, YT subs, masterclass revenue' },
+    { id: id(), date: '2026-07-31', type: 'review',   owner: 'S', title: 'Report deck for Renée: results + Q3 plan' }
+  ];
+}
+
+function id() { return 'i' + Math.random().toString(36).slice(2, 10); }
+
+const TYPE_OPTIONS = [
+  { v: 'video', l: 'Video / longform' },
+  { v: 'thumbnail', l: 'Thumbnail' },
+  { v: 'pdf', l: 'PDF / lead magnet' },
+  { v: 'landing', l: 'Landing page' },
+  { v: 'post', l: 'Social post' },
+  { v: 'email', l: 'Email' },
+  { v: 'review', l: 'Review / decision' }
+];
+
+function cycleOwner(o) { return o === 'R' ? 'S' : 'R'; }
+function cycleType(t) {
+  const idx = TYPE_OPTIONS.findIndex(o => o.v === t);
+  return TYPE_OPTIONS[(idx + 1) % TYPE_OPTIONS.length].v;
+}
+
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function dateKey(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
+function todayKey() {
+  const t = new Date();
+  return dateKey(t.getFullYear(), t.getMonth() + 1, t.getDate());
+}
+function parseMonth(key) { const [y, m] = key.split('-').map(Number); return { y, m }; }
+function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+function dowMon(y, m, d) {
+  // Returns 0..6 with Monday=0
+  const wd = new Date(y, m - 1, d).getDay(); // 0=Sun..6=Sat
+  return (wd + 6) % 7;
+}
+
+function renderCalendar() {
+  // Tabs
+  document.querySelectorAll('.cal-tab[data-month]').forEach(t => {
+    t.classList.toggle('active', t.dataset.month === calState.activeMonth);
+  });
+  // Month grid
+  const wrap = document.getElementById('calendar');
+  wrap.innerHTML = '';
+  wrap.appendChild(renderMonth(calState.activeMonth));
+}
+
+function renderMonth(monthKey) {
+  const { y, m } = parseMonth(monthKey);
+  const monthName = new Date(y, m - 1, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' });
+  const dim = daysInMonth(y, m);
+  const startDow = dowMon(y, m, 1);
+  const monthItems = calState.items.filter(it => it.date.startsWith(monthKey));
+
+  const month = document.createElement('div');
+  month.className = 'month';
+
+  // header
+  const head = document.createElement('div');
+  head.className = 'month-head';
+  head.innerHTML = '<h3>' + monthName + '</h3><div class="month-stats">' + monthItems.length + ' items planned</div>';
+  month.appendChild(head);
+
+  // dow header
+  const dow = document.createElement('div');
+  dow.className = 'cal-dow';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
+    const c = document.createElement('div'); c.textContent = d; dow.appendChild(c);
+  });
+  month.appendChild(dow);
+
+  // grid
+  const grid = document.createElement('div');
+  grid.className = 'cal-grid';
+
+  // empty cells before day 1
+  for (let i = 0; i < startDow; i++) {
+    const e = document.createElement('div');
+    e.className = 'day empty';
+    grid.appendChild(e);
+  }
+
+  const today = todayKey();
+  for (let d = 1; d <= dim; d++) {
+    const key = dateKey(y, m, d);
+    const cell = document.createElement('div');
+    cell.className = 'day';
+    cell.dataset.date = key;
+    const dow0 = dowMon(y, m, d);
+    if (dow0 === 5 || dow0 === 6) cell.classList.add('weekend');
+    if (key === today) cell.classList.add('today');
+
+    const hd = document.createElement('div');
+    hd.className = 'day-head';
+    hd.innerHTML = '<span>' + d + '</span>';
+    const addBtn = document.createElement('button');
+    addBtn.className = 'day-add';
+    addBtn.title = 'Add item';
+    addBtn.textContent = '+';
+    addBtn.onclick = (e) => { e.stopPropagation(); openAddForm(cell, key); };
+    hd.appendChild(addBtn);
+    cell.appendChild(hd);
+
+    const items = document.createElement('div');
+    items.className = 'day-items';
+    monthItems.filter(it => it.date === key).forEach(it => {
+      items.appendChild(renderItem(it));
+    });
+    cell.appendChild(items);
+
+    // drop target
+    cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drag-over'); });
+    cell.addEventListener('dragleave', () => cell.classList.remove('drag-over'));
+    cell.addEventListener('drop', e => {
+      e.preventDefault();
+      cell.classList.remove('drag-over');
+      const itemId = e.dataTransfer.getData('text/plain');
+      if (!itemId) return;
+      const item = calState.items.find(x => x.id === itemId);
+      if (!item) return;
+      if (item.date === key) return;
+      item.date = key;
+      renderCalendar();
+      saveState();
+    });
+
+    grid.appendChild(cell);
+  }
+
+  month.appendChild(grid);
+  return month;
+}
+
+function renderItem(it) {
+  const el = document.createElement('div');
+  el.className = 'cal-item t-' + it.type;
+  el.draggable = true;
+  el.dataset.id = it.id;
+
+  const badge = document.createElement('span');
+  badge.className = 'ibadge ' + it.owner.toLowerCase();
+  badge.textContent = it.owner;
+  badge.title = (it.owner === 'R' ? 'Renée' : 'Stacey') + ' — click to switch owner';
+  badge.onclick = (e) => {
+    e.stopPropagation();
+    it.owner = cycleOwner(it.owner);
+    renderCalendar();
+    saveState();
+  };
+
+  const title = document.createElement('div');
+  title.className = 'ititle';
+  title.textContent = it.title;
+  title.contentEditable = true;
+  title.title = 'Click to edit · click colored stripe to change type';
+  title.addEventListener('input', () => {
+    it.title = title.textContent;
+    debouncedSave();
+  });
+  title.addEventListener('mousedown', e => e.stopPropagation()); // allow text selection without drag
+
+  // cycle type by clicking the left stripe (via dblclick on item)
+  el.addEventListener('dblclick', e => {
+    if (e.target === badge || e.target.classList.contains('iremove')) return;
+    it.type = cycleType(it.type);
+    renderCalendar();
+    saveState();
+  });
+  el.title = 'Drag to move · double-click to change type · click R/S to switch owner';
+
+  const rm = document.createElement('span');
+  rm.className = 'iremove';
+  rm.textContent = '×';
+  rm.title = 'Remove';
+  rm.onclick = (e) => {
+    e.stopPropagation();
+    calState.items = calState.items.filter(x => x.id !== it.id);
+    renderCalendar();
+    saveState();
+  };
+
+  el.appendChild(badge);
+  el.appendChild(title);
+  el.appendChild(rm);
+
+  el.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', it.id);
+    e.dataTransfer.effectAllowed = 'move';
+    el.classList.add('dragging');
+  });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+
+  return el;
+}
+
+function openAddForm(cell, dateKey) {
+  // close any existing
+  document.querySelectorAll('.day-form').forEach(f => f.remove());
+
+  const form = document.createElement('div');
+  form.className = 'day-form';
+  form.innerHTML =
+    '<input type="text" placeholder="What\'s the task?" />' +
+    '<div class="row">' +
+      '<select class="type">' +
+        TYPE_OPTIONS.map(o => '<option value="' + o.v + '">' + o.l + '</option>').join('') +
+      '</select>' +
+      '<select class="owner"><option value="S">S — Stacey</option><option value="R">R — Renée</option></select>' +
+    '</div>' +
+    '<div class="row"><button class="save">Add</button><button class="secondary cancel">Cancel</button></div>';
+  cell.appendChild(form);
+  const inp = form.querySelector('input');
+  inp.focus();
+
+  const save = () => {
+    const title = inp.value.trim();
+    if (!title) { form.remove(); return; }
+    calState.items.push({
+      id: id(),
+      date: dateKey,
+      type: form.querySelector('.type').value,
+      owner: form.querySelector('.owner').value,
+      title
+    });
+    renderCalendar();
+    saveState();
+  };
+  form.querySelector('.save').onclick = (e) => { e.stopPropagation(); save(); };
+  form.querySelector('.cancel').onclick = (e) => { e.stopPropagation(); form.remove(); };
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') save();
+    if (e.key === 'Escape') form.remove();
+  });
+}
+
+function addBlankItem() {
+  const tkey = todayKey();
+  // pick the month tab matching today, fallback to active month
+  const monthKey = tkey.slice(0, 7);
+  if (['2026-05','2026-06','2026-07'].includes(monthKey)) {
+    calState.activeMonth = monthKey;
+  }
+  renderCalendar();
+  // find today's cell
+  const cell = document.querySelector('.day[data-date="' + tkey + '"]') || document.querySelector('.day:not(.empty)');
+  if (cell) {
+    cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    openAddForm(cell, cell.dataset.date);
+  }
+}
+
+// Tab clicks
+document.querySelectorAll('.cal-tab[data-month]').forEach(t => {
+  t.onclick = () => { calState.activeMonth = t.dataset.month; renderCalendar(); saveState(); };
+});
+
+// ============= FULL REWRITE MODE =============
+// Make every static text element editable with a stable data-key, then let the
+// wire-up below attach the input/blur save listeners automatically.
+(function enableFullEdit() {
+  const SEL = [
+    'h1', 'h2', '.tl h3',
+    '.kpi .label', '.kpi .sub',
+    '.platform .pname', '.platform .phandle', '.platform .pmetric',
+    '.compete .cname', '.compete .ctag', '.compete .earn', '.compete .note',
+    '.compete .crow .ck', '.compete .crow .cv',
+    '.tl li',
+    '.phase .ph-name', '.phase .ph-month', '.phase .ph-goal',
+    '.cal-intro', '.cal-legend .lg',
+    '.edit-hint', 'footer'
+  ];
+  SEL.forEach(s => {
+    document.querySelectorAll(s).forEach((el, i) => {
+      if (el.hasAttribute('contenteditable')) return;
+      if (el.querySelector('[contenteditable][data-key]')) return; // skip if a child is already tracked
+      el.contentEditable = 'true';
+      if (!el.dataset.key) el.dataset.key = 'rw_' + s.replace(/[^a-z0-9]/gi, '_') + '_' + i;
+    });
+  });
+})();
+
+// Wire up editing & checkboxes
+document.querySelectorAll('[contenteditable][data-key]').forEach(el => {
+  el.addEventListener('input', debouncedSave);
+  el.addEventListener('blur', saveState);
+});
+document.querySelectorAll('.action [contenteditable]').forEach(el => {
+  el.addEventListener('input', debouncedSave);
+  el.addEventListener('blur', saveState);
+});
+document.querySelectorAll('[data-action]').forEach(cb => {
+  cb.addEventListener('change', () => { cb.closest('.action').classList.toggle('done', cb.checked); saveState(); });
+});
+
+// ============= CHARTS =============
+const chartFontColor = '#444';
+const gridColor = 'rgba(0,0,0,0.06)';
+const baseOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartFontColor, font: { size: 11 } } } } };
+
+new Chart(document.getElementById('chartFollowers'), {
+  type: 'bar',
+  data: { labels: ['Instagram','YouTube','Facebook','LinkedIn','Twitter'], datasets: [{ label: 'Followers', data: [18400,15300,8800,5093,2096], backgroundColor: ['#E1306C','#FF0000','#1877F2','#0A66C2','#1DA1F2'], borderRadius: 6 }] },
+  options: { ...baseOpts, plugins: { ...baseOpts.plugins, title: { display: true, text: 'Followers by platform', color: chartFontColor, font: { size: 13, weight: '600' } } }, scales: { x: { ticks: { color: chartFontColor, font: { size: 11 } }, grid: { display: false } }, y: { ticks: { color: chartFontColor, font: { size: 10 }, callback: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v }, grid: { color: gridColor } } } }
+});
+
+new Chart(document.getElementById('chartGrowth'), {
+  type: 'line',
+  data: { labels: ['May','Jun','Jul','Aug'], datasets: [
+    { label: 'Current trajectory', data: [1.65,1.72,1.78,1.85], borderColor: '#7F77DD', backgroundColor: 'rgba(127,119,221,0.1)', borderWidth: 2, pointRadius: 4, tension: 0.3, fill: true },
+    { label: 'Target', data: [1.65,2.0,2.5,2.5], borderColor: '#1D9E75', borderDash: [6,4], backgroundColor: 'rgba(29,158,117,0.05)', borderWidth: 2, pointRadius: 4, tension: 0.3, fill: true }
+  ]},
+  options: { ...baseOpts, plugins: { ...baseOpts.plugins, title: { display: true, text: 'Instagram engagement projection', color: chartFontColor, font: { size: 13, weight: '600' } } }, scales: { x: { ticks: { color: chartFontColor }, grid: { display: false } }, y: { min: 1, max: 3, ticks: { color: chartFontColor, callback: v => v.toFixed(1)+'%' }, grid: { color: gridColor } } } }
+});
+
+new Chart(document.getElementById('chartEarnings'), {
+  type: 'bar',
+  data: { labels: ['Renée','Vinh Giang','Vanessa Edwards'], datasets: [{ label: 'Estimated monthly YouTube earnings', data: [149,9500,15000], backgroundColor: ['#7F77DD','#1D9E75','#D85A30'], borderRadius: 6 }] },
+  options: { ...baseOpts, plugins: { ...baseOpts.plugins, title: { display: true, text: 'Monthly YouTube earnings', color: chartFontColor, font: { size: 13, weight: '600' } } }, scales: { x: { ticks: { color: chartFontColor }, grid: { display: false } }, y: { ticks: { color: chartFontColor, callback: v => '$' + v.toLocaleString() }, grid: { color: gridColor } } } }
+});
+
+new Chart(document.getElementById('chartCadence'), {
+  type: 'bar',
+  data: { labels: ['Renée','Vinh Giang','Vanessa Edwards'], datasets: [
+    { label: 'Shorts / week', data: [5,5,7], backgroundColor: '#7F77DD', borderRadius: 6 },
+    { label: 'Longform / week', data: [0,1,0.1], backgroundColor: '#AFA9EC', borderRadius: 6 }
+  ]},
+  options: { ...baseOpts, plugins: { ...baseOpts.plugins, title: { display: true, text: 'Upload cadence — shorts vs longform', color: chartFontColor, font: { size: 13, weight: '600' } } }, scales: { x: { ticks: { color: chartFontColor }, grid: { display: false } }, y: { ticks: { color: chartFontColor }, grid: { color: gridColor } } } }
+});
+
+// ============= BOOT =============
+loadState();
+renderCalendar();
+if (!document.getElementById('lastUpdated').textContent || document.getElementById('lastUpdated').textContent === '—') {
+  document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+}
+</script>
+</body>
+</html>
