@@ -1,0 +1,572 @@
+<title>Marino Stat Overlays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&display=swap">
+<style>
+:root{
+  --ink:#12100E; --paper:#FAF7F2; --teal:#17A08C; --ember:#E86A2C; --gold:#E8B647;
+  --bg:#F3F0EA; --surface:#FFFFFF; --line:#E0DACF; --text:#1B1815; --dim:#6E665C;
+  --field:#FFFFFF; --fieldline:#D6CFC3;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#141210; --surface:#1E1B18; --line:#332E28; --text:#F2EEE7; --dim:#9A9186;
+  --field:#26221E; --fieldline:#3D3730;
+}}
+:root[data-theme="dark"]{
+  --bg:#141210; --surface:#1E1B18; --line:#332E28; --text:#F2EEE7; --dim:#9A9186;
+  --field:#26221E; --fieldline:#3D3730;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  padding-inline:20px; padding-block:28px 56px; max-width:1240px; margin:0 auto;
+  line-height:1.5;
+}
+h1{font-family:Fraunces,Georgia,serif; font-size:31px; font-weight:900; letter-spacing:-.6px; line-height:1.15}
+.lede{color:var(--dim); font-size:14.5px; margin-top:7px; max-width:62ch}
+.rule{height:1px;background:var(--line);margin:22px 0 24px;border:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.seg{display:flex;border:1px solid var(--fieldline);border-radius:9px;overflow:hidden;background:var(--field)}
+.seg button{
+  background:transparent;border:0;color:var(--dim);font:600 12.5px Archivo,sans-serif;
+  padding:9px 15px;cursor:pointer;letter-spacing:.4px
+}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.btn{
+  background:var(--ink);color:var(--paper);border:0;border-radius:9px;cursor:pointer;
+  font:600 12.5px Archivo,sans-serif;padding:10px 16px;letter-spacing:.3px
+}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--fieldline)}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,textarea:focus-visible,
+.cardlist button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:238px minmax(0,1fr) 288px;gap:22px;align-items:start}
+@media (max-width:1000px){ .wrap{grid-template-columns:1fr} }
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px}
+.panel h2{
+  font:600 10.5px Archivo,sans-serif;text-transform:uppercase;letter-spacing:1.6px;
+  color:var(--dim);margin-bottom:11px
+}
+.cardlist{display:flex;flex-direction:column;gap:2px;max-height:520px;overflow-y:auto}
+.cardlist button{
+  text-align:left;background:transparent;border:0;border-radius:7px;cursor:pointer;
+  color:var(--text);font:500 13px Archivo,sans-serif;padding:8px 10px;
+  display:flex;align-items:center;gap:9px;width:100%
+}
+.cardlist button:hover{background:var(--bg)}
+.cardlist button[aria-current="true"]{background:var(--ink);color:var(--paper)}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.cardlist .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{
+  font:600 9px Archivo,sans-serif;letter-spacing:.7px;text-transform:uppercase;
+  padding:2px 5px;border-radius:4px;flex:none
+}
+.tag.blank{background:var(--gold);color:#2A2008}
+.stage{
+  background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px;
+  display:flex;flex-direction:column;align-items:center;gap:13px
+}
+.checker{
+  width:100%;border-radius:9px;overflow:hidden;line-height:0;
+  background-color:#CFCAC2;
+  background-image:linear-gradient(45deg,#B6B0A6 25%,transparent 25%,transparent 75%,#B6B0A6 75%),
+                   linear-gradient(45deg,#B6B0A6 25%,transparent 25%,transparent 75%,#B6B0A6 75%);
+  background-size:22px 22px;background-position:0 0,11px 11px;
+}
+#preview{display:block;width:100%;height:auto;max-width:100%}
+.stagemeta{font-size:11.5px;color:var(--dim);letter-spacing:.3px;text-align:center}
+.fields{display:flex;flex-direction:column;gap:13px}
+label{display:block;font:600 10.5px Archivo,sans-serif;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin-bottom:5px}
+input,textarea{
+  width:100%;background:var(--field);border:1px solid var(--fieldline);border-radius:8px;
+  color:var(--text);font:400 13.5px Archivo,sans-serif;padding:9px 11px;resize:vertical
+}
+textarea{line-height:1.5}
+.hint{font-size:11.5px;color:var(--dim);line-height:1.5;margin-top:3px}
+.note{
+  background:color-mix(in srgb,var(--gold) 16%,var(--surface));
+  border:1px solid color-mix(in srgb,var(--gold) 45%,var(--line));
+  border-radius:9px;padding:11px 13px;font-size:12.5px;line-height:1.55;margin-top:14px
+}
+.note b{font-weight:700}
+.src{margin-top:26px;font-size:12px;color:var(--dim);line-height:1.65}
+.src code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+.dlrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+</style>
+
+<h1>Marino Stat Overlays</h1>
+<p class="lede">Transparent stat and comment cards cut for video. Every figure below is
+sourced and dated — edit anything, then download the PNG and drop it straight on the timeline.</p>
+<hr class="rule">
+
+<div class="bar">
+  <div class="seg" role="group" aria-label="Frame size">
+    <button id="fmt-vertical" aria-pressed="true">1080 × 1920 &nbsp;Vertical</button>
+    <button id="fmt-horizontal" aria-pressed="false">1920 × 1080 &nbsp;Horizontal</button>
+  </div>
+  <button class="btn" id="dl">Download this card</button>
+  <button class="btn ghost" id="dlall">Download all (both sizes)</button>
+  <button class="btn ghost" id="reset">Reset to verified values</button>
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Cards</h2>
+    <div class="cardlist" id="list"></div>
+  </div>
+
+  <div class="stage">
+    <div class="checker"><canvas id="preview" width="1080" height="1920"></canvas></div>
+    <div class="stagemeta" id="stagemeta">Checkerboard shows where the PNG is transparent</div>
+  </div>
+
+  <div class="panel">
+    <h2>Edit</h2>
+    <div class="fields" id="fields"></div>
+    <div class="note" id="note" hidden></div>
+    <div class="dlrow"><button class="btn" id="dl2">Download PNG</button></div>
+  </div>
+</div>
+
+<div class="src">
+  <b>Sources.</b> YouTube figures read from channel <code>UCsSkET6muRFdrKhnW2yyr7g</code> and
+  video <code>0RVqSBisvHU</code> on 21 Sep 2026. Instagram from <code>@iamreneemarino</code>,
+  same date. LinkedIn followers from the May 2026 dashboard snapshot. Comments are reproduced
+  verbatim from public YouTube threads. LinkedIn impressions are not machine-readable without
+  the account owner's login, so that card ships blank.
+</div>
+
+<script>
+/* ---------- palette ---------- */
+var INK='#12100E', PAPER='#FAF7F2', TEAL='#17A08C', EMBER='#E86A2C', GOLD='#E8B647', MUTE='#93897D';
+
+var PLAT={
+  youtube  :{name:'YouTube',   color:'#FF3B30'},
+  instagram:{name:'Instagram', color:'#F05C8C'},
+  linkedin :{name:'LinkedIn',  color:'#3E92E0'},
+  facebook :{name:'Facebook',  color:'#4C94F5'},
+  x        :{name:'X',         color:'#D8D4CD'},
+  all      :{name:'All',       color:TEAL}
+};
+
+/* ---------- verified card data ---------- */
+var BASE=[
+  {id:'peak-views', kind:'stat', platform:'youtube', tone:'peak',
+   eyebrow:'Best performing post · all platforms', value:'3,077,079', unit:'views on a single video',
+   context:'“Something changed in 2010… and it’s scary…”',
+   meta:'YouTube · as of 21 Sep 2026'},
+
+  {id:'peak-likes', kind:'stat', platform:'youtube', tone:'peak',
+   eyebrow:'Same video', value:'184,671', unit:'likes',
+   context:'A 6.0% like-to-view rate.',
+   meta:'YouTube · as of 21 Sep 2026'},
+
+  {id:'peak-comments', kind:'stat', platform:'youtube', tone:'peak',
+   eyebrow:'Same video', value:'11,042', unit:'comments',
+   context:'One post, eleven thousand conversations.',
+   meta:'YouTube · as of 21 Sep 2026'},
+
+  {id:'yt-lifetime', kind:'stat', platform:'youtube', tone:'normal',
+   eyebrow:'YouTube · lifetime', value:'3,239,159', unit:'total views',
+   context:'Across 297 videos.',
+   meta:'YouTube · as of 21 Sep 2026'},
+
+  {id:'yt-subs', kind:'stat', platform:'youtube', tone:'normal',
+   eyebrow:'YouTube', value:'15,200', unit:'subscribers',
+   context:'Communicate with Confidence!',
+   meta:'YouTube · as of 21 Sep 2026'},
+
+  {id:'ig-followers', kind:'stat', platform:'instagram', tone:'normal',
+   eyebrow:'Instagram · verified', value:'23.4K', unit:'followers',
+   context:'@iamreneemarino · 2.4K posts',
+   meta:'Instagram · as of 21 Sep 2026'},
+
+  {id:'li-followers', kind:'stat', platform:'linkedin', tone:'normal',
+   eyebrow:'LinkedIn', value:'5,093', unit:'followers',
+   context:'Highest-intent audience of the five platforms.',
+   meta:'LinkedIn · as of May 2026'},
+
+  {id:'li-impressions', kind:'stat', platform:'linkedin', tone:'blank',
+   eyebrow:'LinkedIn · last 30 days', value:'', unit:'impressions',
+   context:'',
+   meta:'LinkedIn · add date'},
+
+  {id:'audience-rank', kind:'rank', platform:'all', tone:'normal',
+   eyebrow:'Audience across five platforms', title:'Where the audience is',
+   rows:[
+     {label:'Instagram', value:23400, display:'23.4K',  color:PLAT.instagram.color},
+     {label:'YouTube',   value:15200, display:'15,200', color:PLAT.youtube.color},
+     {label:'Facebook',  value:8800,  display:'8,800',  color:PLAT.facebook.color},
+     {label:'LinkedIn',  value:5093,  display:'5,093',  color:PLAT.linkedin.color},
+     {label:'X',         value:2096,  display:'2,096',  color:PLAT.x.color}
+   ],
+   meta:'IG & YouTube 21 Sep 2026 · FB, LinkedIn & X May 2026'},
+
+  {id:'comment-pause', kind:'comment', platform:'youtube', tone:'normal',
+   eyebrow:'Real comment', author:'Michael Lopez Calleja', handle:'@michaellopezcalleja',
+   body:'The power of the pause!',
+   meta:'YouTube · 15 Sep 2026'},
+
+  {id:'comment-parrot', kind:'comment', platform:'youtube', tone:'normal',
+   eyebrow:'Real comment', author:'Margo Vallen', handle:'@margovallen',
+   body:'Everybody, and their pet parrot.. has a cell phone. Social media, for many.. are the only friends they have.',
+   meta:'YouTube · 30 Apr 2026'},
+
+  {id:'comment-workplace', kind:'comment', platform:'youtube', tone:'normal',
+   eyebrow:'Real comment', author:'Kate Thayer', handle:'@katethayer4633',
+   body:'I agree, and I can think of a few people, especially in my workplace, who could benefit from these five rules of engagement.',
+   meta:'YouTube · 2 May 2026'},
+
+  {id:'comment-room', kind:'comment', platform:'youtube', tone:'normal',
+   eyebrow:'Real comment', author:'Kate Thayer', handle:'@katethayer4633',
+   body:'I imagine it means capturing everyone’s attention in the room, and speaking in a way that’s eloquent, yet relatable.',
+   meta:'YouTube · 4 Sep 2026'},
+
+  {id:'comment-reel', kind:'comment', platform:'youtube', tone:'normal',
+   eyebrow:'Real comment', author:'Riding the Trauma Train', handle:'@ridingthetraumatrain',
+   body:'WOW!!! What a reel!!!! 💚💚💚',
+   meta:'YouTube · 3 Jun 2026'},
+
+  {id:'comment-chills', kind:'comment', platform:'youtube', tone:'normal',
+   eyebrow:'Real comment', author:'Riding the Trauma Train', handle:'@ridingthetraumatrain',
+   body:'Still get chills ‘looking back at me’ 💚',
+   meta:'YouTube · 23 Jul 2026'}
+];
+
+var NOTES={
+  'li-impressions':'<b>This card is intentionally blank.</b> LinkedIn only shows impressions to the account owner, so there was nothing to read. Get it from LinkedIn → Me → Posts &amp; Activity → Analytics → Impressions, type it in, and set the date.',
+  'li-followers':'<b>5,093 is real but four months old</b> — it comes from the May 2026 dashboard. Check the live number on her profile and update it if it has moved.'
+};
+
+/* ---------- formats ---------- */
+var FORMATS={
+  vertical  :{w:1080,h:1920,plateX:90,plateW:900,bottom:1450,S:1,    label:'1080 × 1920'},
+  horizontal:{w:1920,h:1080,plateX:96,plateW:860,bottom:986, S:0.88, label:'1920 × 1080'}
+};
+
+/* ---------- canvas helpers ---------- */
+function rr(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y); c.lineTo(x+w-r,y); c.quadraticCurveTo(x+w,y,x+w,y+r);
+  c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r);
+  c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
+}
+function ls(c,v){ try{ c.letterSpacing=v+'px'; }catch(e){} }
+function wrapText(c,text,maxW){
+  var words=String(text).split(/\s+/), lines=[], cur='';
+  for(var i=0;i<words.length;i++){
+    var trial=cur?cur+' '+words[i]:words[i];
+    if(c.measureText(trial).width>maxW && cur){ lines.push(cur); cur=words[i]; }
+    else cur=trial;
+  }
+  if(cur) lines.push(cur);
+  return lines;
+}
+function F(weight,size,fam){ return weight+' '+size+'px '+fam; }
+var ARCH='Archivo, -apple-system, "Segoe UI", sans-serif';
+var FRAU='Fraunces, Georgia, "Times New Roman", serif';
+
+/* ---------- layout: returns blocks + total height ---------- */
+function layout(c,card,fm){
+  var S=fm.S, pad=Math.round(64*S), innerW=fm.plateW-pad*2, b=[], y=0;
+  function push(o){ b.push(o); y+=o.h+(o.gap||0); }
+
+  if(card.kind==='rank'){
+    ls(c,3*S); c.font=F(600,Math.round(26*S),ARCH);
+    push({t:'eyebrow',text:card.eyebrow.toUpperCase(),color:TEAL,size:Math.round(26*S),h:Math.round(26*S),gap:Math.round(26*S)});
+    ls(c,0); c.font=F(900,Math.round(56*S),FRAU);
+    push({t:'title',text:card.title,size:Math.round(56*S),h:Math.round(56*S),gap:Math.round(38*S)});
+    var max=0,i;
+    for(i=0;i<card.rows.length;i++) if(card.rows[i].value>max) max=card.rows[i].value;
+    for(i=0;i<card.rows.length;i++){
+      push({t:'row',row:card.rows[i],max:max,h:Math.round(84*S),gap:i===card.rows.length-1?0:Math.round(14*S)});
+    }
+  } else if(card.kind==='comment'){
+    ls(c,3*S); c.font=F(600,Math.round(24*S),ARCH);
+    push({t:'eyebrow',text:card.eyebrow.toUpperCase(),color:PLAT[card.platform].color,size:Math.round(24*S),h:Math.round(24*S),gap:Math.round(30*S)});
+    push({t:'author',author:card.author,handle:card.handle,h:Math.round(74*S),gap:Math.round(30*S)});
+    ls(c,0); c.font=F(400,Math.round(40*S),ARCH);
+    var lines=wrapText(c,card.body,innerW), lh=Math.round(56*S);
+    push({t:'body',lines:lines,lh:lh,size:Math.round(40*S),h:lines.length*lh,gap:Math.round(34*S)});
+  } else {
+    ls(c,3*S); c.font=F(600,Math.round(26*S),ARCH);
+    var ew=innerW, elines=wrapText(c,card.eyebrow.toUpperCase(),ew);
+    push({t:'eyebrow',text:elines.join(' '),color:PLAT[card.platform].color,size:Math.round(26*S),h:Math.round(26*S),gap:Math.round(30*S)});
+    var vs=Math.round((card.tone==='peak'?176:146)*S);
+    ls(c,-2*S); c.font=F(900,vs,FRAU);
+    var shown=card.value&&String(card.value).trim()?String(card.value):'';
+    while(shown && c.measureText(shown).width>innerW && vs>60){ vs-=6; c.font=F(900,vs,FRAU); }
+    /* Fraunces commas and parens descend well below the baseline, so the value
+       block reserves the full descender before the unit line starts. */
+    push({t:'value',text:shown,size:vs,h:Math.round(vs*0.92),gap:Math.round(18*S)});
+    if(card.unit){
+      ls(c,0); c.font=F(500,Math.round(38*S),ARCH);
+      var ul=wrapText(c,card.unit,innerW), ulh=Math.round(48*S);
+      push({t:'unit',lines:ul,lh:ulh,size:Math.round(38*S),h:ul.length*ulh,gap:Math.round(card.context?26*S:34*S)});
+    }
+    if(card.context){
+      ls(c,0); c.font=F(400,Math.round(30*S),ARCH);
+      var cl=wrapText(c,card.context,innerW), clh=Math.round(42*S);
+      push({t:'context',lines:cl,lh:clh,size:Math.round(30*S),h:cl.length*clh,gap:Math.round(34*S)});
+    }
+  }
+  if(card.meta){
+    push({t:'rule',h:1,gap:Math.round(22*S)});
+    ls(c,2*S); c.font=F(500,Math.round(22*S),ARCH);
+    push({t:'meta',text:card.meta.toUpperCase(),size:Math.round(22*S),h:Math.round(22*S),gap:0});
+  }
+  ls(c,0);
+  return {blocks:b,contentH:y,pad:pad,innerW:innerW};
+}
+
+/* ---------- draw ---------- */
+function drawCard(c,card,fm){
+  var S=fm.S;
+  c.clearRect(0,0,fm.w,fm.h);
+  c.textBaseline='alphabetic';
+
+  var L=layout(c,card,fm);
+  var plateH=L.contentH+L.pad*2;
+  var px=fm.plateX, py=fm.bottom-plateH, pw=fm.plateW;
+
+  /* plate */
+  c.save();
+  c.shadowColor='rgba(0,0,0,0.45)';
+  c.shadowBlur=Math.round(48*S); c.shadowOffsetY=Math.round(16*S);
+  c.fillStyle='rgba(18,16,14,0.93)';
+  rr(c,px,py,pw,plateH,Math.round(28*S)); c.fill();
+  c.restore();
+
+  /* accent rail */
+  var rail = card.kind==='comment' ? PLAT[card.platform].color
+           : (card.tone==='peak' ? GOLD : PLAT[card.platform].color);
+  c.save();
+  rr(c,px,py,pw,plateH,Math.round(28*S)); c.clip();
+  c.fillStyle=rail; c.fillRect(px,py,Math.round(8*S),plateH);
+  c.restore();
+
+  var x=px+L.pad, y=py+L.pad, i, j;
+
+  for(i=0;i<L.blocks.length;i++){
+    var b=L.blocks[i];
+
+    if(b.t==='eyebrow'){
+      ls(c,3*S); c.font=F(600,b.size,ARCH); c.fillStyle=b.color;
+      c.fillText(b.text,x,y+b.size*0.82); ls(c,0);
+
+    }else if(b.t==='title'){
+      c.font=F(900,b.size,FRAU); c.fillStyle=PAPER;
+      c.fillText(b.text,x,y+b.size*0.80);
+
+    }else if(b.t==='value'){
+      if(b.text){
+        ls(c,-2*S); c.font=F(900,b.size,FRAU); c.fillStyle=PAPER;
+        c.fillText(b.text,x,y+b.size*0.74); ls(c,0);
+      }else{
+        /* blank template: dashed slot, never a fabricated figure */
+        var sw=Math.round(L.innerW*0.62), sh=Math.round(b.size*0.80);
+        c.save();
+        c.setLineDash([Math.round(14*S),Math.round(11*S)]);
+        c.lineWidth=Math.round(3*S); c.strokeStyle='rgba(232,182,71,0.85)';
+        rr(c,x,y,sw,sh,Math.round(14*S)); c.stroke();
+        c.restore();
+        ls(c,2*S); c.font=F(600,Math.round(26*S),ARCH); c.fillStyle=GOLD;
+        c.fillText('YOUR FIGURE HERE',x+Math.round(26*S),y+sh/2+Math.round(9*S)); ls(c,0);
+      }
+
+    }else if(b.t==='unit'){
+      c.font=F(500,b.size,ARCH); c.fillStyle='rgba(250,247,242,0.74)';
+      for(j=0;j<b.lines.length;j++) c.fillText(b.lines[j],x,y+b.lh*j+b.size*0.86);
+
+    }else if(b.t==='context'){
+      c.font=F(400,b.size,ARCH); c.fillStyle=MUTE;
+      for(j=0;j<b.lines.length;j++) c.fillText(b.lines[j],x,y+b.lh*j+b.size*0.86);
+
+    }else if(b.t==='author'){
+      var av=Math.round(74*S), r=av/2;
+      c.save();
+      c.beginPath(); c.arc(x+r,y+r,r,0,Math.PI*2); c.closePath();
+      c.fillStyle=TEAL; c.fill();
+      c.font=F(700,Math.round(32*S),ARCH); c.fillStyle='#07211D';
+      c.textAlign='center';
+      c.fillText(b.author.charAt(0).toUpperCase(),x+r,y+r+Math.round(11*S));
+      c.textAlign='left'; c.restore();
+      var tx=x+av+Math.round(22*S);
+      c.font=F(700,Math.round(32*S),ARCH); c.fillStyle=PAPER;
+      c.fillText(b.author,tx,y+Math.round(30*S));
+      c.font=F(400,Math.round(25*S),ARCH); c.fillStyle=MUTE;
+      c.fillText(b.handle,tx,y+Math.round(64*S));
+
+    }else if(b.t==='body'){
+      c.font=F(400,b.size,ARCH); c.fillStyle=PAPER;
+      for(j=0;j<b.lines.length;j++) c.fillText(b.lines[j],x,y+b.lh*j+b.size*0.84);
+
+    }else if(b.t==='row'){
+      var ro=b.row, dot=Math.round(13*S);
+      c.beginPath(); c.arc(x+dot/2,y+Math.round(15*S),dot/2,0,Math.PI*2); c.closePath();
+      c.fillStyle=ro.color; c.fill();
+      c.font=F(600,Math.round(29*S),ARCH); c.fillStyle=PAPER;
+      c.fillText(ro.label,x+dot+Math.round(16*S),y+Math.round(25*S));
+      ls(c,-1*S); c.font=F(700,Math.round(33*S),FRAU); c.fillStyle=PAPER;
+      c.textAlign='right'; c.fillText(ro.display,x+L.innerW,y+Math.round(25*S));
+      c.textAlign='left'; ls(c,0);
+      var by=y+Math.round(48*S), bh=Math.round(12*S), bw=L.innerW;
+      c.fillStyle='rgba(250,247,242,0.10)';
+      rr(c,x,by,bw,bh,bh/2); c.fill();
+      var fw=Math.max(bh,Math.round(bw*(ro.value/b.max)));
+      c.fillStyle=ro.color; rr(c,x,by,fw,bh,bh/2); c.fill();
+
+    }else if(b.t==='rule'){
+      c.fillStyle='rgba(250,247,242,0.16)';
+      c.fillRect(x,y,L.innerW,Math.max(1,Math.round(1*S)));
+
+    }else if(b.t==='meta'){
+      ls(c,2*S); c.font=F(500,b.size,ARCH); c.fillStyle='rgba(147,137,125,0.95)';
+      c.fillText(b.text,x,y+b.size*0.84); ls(c,0);
+    }
+
+    y+=b.h+(b.gap||0);
+  }
+}
+window.drawCard=drawCard; window.FORMATS=FORMATS; window.BASE=BASE;
+
+/* ---------- app state ---------- */
+var KEY='marinoOverlaysV1';
+var cards=JSON.parse(JSON.stringify(BASE));
+var fmtKey='vertical', selected=cards[0].id;
+
+function load(){
+  try{
+    var raw=localStorage.getItem(KEY); if(!raw) return;
+    var saved=JSON.parse(raw);
+    cards.forEach(function(cd){
+      if(saved[cd.id]) Object.keys(saved[cd.id]).forEach(function(k){ cd[k]=saved[cd.id][k]; });
+    });
+  }catch(e){}
+}
+function save(){
+  try{
+    var o={};
+    cards.forEach(function(cd){
+      var bs=BASE.filter(function(z){return z.id===cd.id;})[0], d={};
+      ['eyebrow','value','unit','context','meta','author','handle','body','title'].forEach(function(k){
+        if(cd[k]!==undefined && cd[k]!==bs[k]) d[k]=cd[k];
+      });
+      if(Object.keys(d).length) o[cd.id]=d;
+    });
+    localStorage.setItem(KEY,JSON.stringify(o));
+  }catch(e){}
+}
+function cur(){ return cards.filter(function(c){return c.id===selected;})[0]; }
+
+/* ---------- ui ---------- */
+var listEl=document.getElementById('list'),
+    fieldsEl=document.getElementById('fields'),
+    noteEl=document.getElementById('note'),
+    cv=document.getElementById('preview'),
+    ctx=cv.getContext('2d'),
+    metaEl=document.getElementById('stagemeta');
+
+function renderList(){
+  listEl.innerHTML='';
+  cards.forEach(function(cd){
+    var b=document.createElement('button');
+    b.setAttribute('aria-current', cd.id===selected?'true':'false');
+    var blank = cd.tone==='blank' && !(cd.value&&String(cd.value).trim());
+    b.innerHTML='<span class="dot" style="background:'+PLAT[cd.platform].color+'"></span>'+
+                '<span class="nm">'+cd.id+'</span>'+
+                (blank?'<span class="tag blank">blank</span>':'');
+    b.onclick=function(){ selected=cd.id; renderList(); renderFields(); paint(); };
+    listEl.appendChild(b);
+  });
+}
+
+function field(key,label,multiline,hint){
+  var cd=cur(), id='f-'+key;
+  var w=document.createElement('div');
+  var el=document.createElement(multiline?'textarea':'input');
+  el.id=id; el.value=cd[key]==null?'':cd[key];
+  if(multiline) el.rows=key==='body'?4:2;
+  el.oninput=function(){ cd[key]=el.value; save(); paint(); };
+  var l=document.createElement('label'); l.htmlFor=id; l.textContent=label;
+  w.appendChild(l); w.appendChild(el);
+  if(hint){ var h=document.createElement('div'); h.className='hint'; h.textContent=hint; w.appendChild(h); }
+  fieldsEl.appendChild(w);
+}
+
+function renderFields(){
+  var cd=cur(); fieldsEl.innerHTML='';
+  if(cd.kind==='comment'){
+    field('eyebrow','Eyebrow'); field('author','Name'); field('handle','Handle');
+    field('body','Comment',true,'Reproduced verbatim from the public thread.');
+  }else if(cd.kind==='rank'){
+    field('eyebrow','Eyebrow'); field('title','Headline');
+  }else{
+    field('eyebrow','Eyebrow');
+    field('value','Figure',false, cd.tone==='blank'?'Leave empty to keep the blank slot.':'');
+    field('unit','Unit'); field('context','Context',true);
+  }
+  field('meta','Source line',false,'Keep the platform and the as-of date.');
+  if(NOTES[cd.id]){ noteEl.hidden=false; noteEl.innerHTML=NOTES[cd.id]; } else noteEl.hidden=true;
+}
+
+function paint(){
+  var fm=FORMATS[fmtKey];
+  cv.width=fm.w; cv.height=fm.h;
+  drawCard(ctx,cur(),fm);
+  metaEl.textContent=fm.label+' · transparent PNG · checkerboard marks the cut-out';
+}
+
+function setFmt(k){
+  fmtKey=k;
+  document.getElementById('fmt-vertical').setAttribute('aria-pressed',String(k==='vertical'));
+  document.getElementById('fmt-horizontal').setAttribute('aria-pressed',String(k==='horizontal'));
+  paint();
+}
+document.getElementById('fmt-vertical').onclick=function(){ setFmt('vertical'); };
+document.getElementById('fmt-horizontal').onclick=function(){ setFmt('horizontal'); };
+
+function download(card,fmKey){
+  var fm=FORMATS[fmKey], off=document.createElement('canvas');
+  off.width=fm.w; off.height=fm.h;
+  drawCard(off.getContext('2d'),card,fm);
+  return new Promise(function(res){
+    off.toBlob(function(blob){
+      var u=URL.createObjectURL(blob), a=document.createElement('a');
+      a.href=u; a.download='marino-'+card.id+'-'+fmKey+'.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(u); res(); },400);
+    },'image/png');
+  });
+}
+document.getElementById('dl').onclick=function(){ download(cur(),fmtKey); };
+document.getElementById('dl2').onclick=function(){ download(cur(),fmtKey); };
+document.getElementById('dlall').onclick=async function(){
+  var btn=this; btn.disabled=true; var t=btn.textContent;
+  for(var i=0;i<cards.length;i++){
+    btn.textContent='Downloading '+(i+1)+' / '+cards.length;
+    await download(cards[i],'vertical');
+    await download(cards[i],'horizontal');
+  }
+  btn.textContent=t; btn.disabled=false;
+};
+document.getElementById('reset').onclick=function(){
+  cards=JSON.parse(JSON.stringify(BASE));
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  renderList(); renderFields(); paint();
+};
+
+load(); renderList(); renderFields();
+if(document.fonts&&document.fonts.ready){
+  Promise.all([
+    document.fonts.load('900 176px Fraunces'),
+    document.fonts.load('700 33px Fraunces'),
+    document.fonts.load('600 26px Archivo'),
+    document.fonts.load('400 40px Archivo'),
+    document.fonts.load('500 38px Archivo'),
+    document.fonts.load('700 32px Archivo')
+  ]).then(function(){ return document.fonts.ready; }).then(paint).catch(paint);
+}else paint();
+paint();
+</script>
