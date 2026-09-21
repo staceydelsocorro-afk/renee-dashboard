@@ -140,6 +140,9 @@ sourced and dated — edit anything, then download the PNG and drop it straight 
 /* ---------- palette ---------- */
 var INK='#12100E', PAPER='#FAF7F2', TEAL='#17A08C', EMBER='#E86A2C', GOLD='#E8B647', MUTE='#93897D';
 
+var RENEE={name:'Renée Marino', handle:'@iamreneemarino'};
+var AVATAR=null;   /* optional headshot Image, set from the studio's file picker */
+
 var PLAT={
   youtube  :{name:'YouTube',   color:'#FF3B30'},
   instagram:{name:'Instagram', color:'#F05C8C'},
@@ -230,8 +233,46 @@ var BASE=[
   {id:'comment-chills', kind:'comment', platform:'youtube', tone:'normal',
    eyebrow:'Real comment', author:'Riding the Trauma Train', handle:'@ridingthetraumatrain',
    body:'Still get chills ‘looking back at me’ 💚',
-   meta:'YouTube · 23 Jul 2026'}
+   meta:'YouTube · 23 Jul 2026'},
+
+  {id:'thread-pause', kind:'thread', platform:'youtube', tone:'normal',
+   eyebrow:'Real exchange', author:'Michael Lopez Calleja', handle:'@michaellopezcalleja',
+   body:'The power of the pause!',
+   reply:'Yes!! 🙌 The pause can say so much. Sometimes slowing down and really being present is exactly what the conversation needs. ❤️',
+   meta:'YouTube · 15 Sep 2026'},
+
+  {id:'thread-room', kind:'thread', platform:'youtube', tone:'normal',
+   eyebrow:'Real exchange', author:'Kate Thayer', handle:'@katethayer4633',
+   body:'I don’t think I have ever owned a room in my life, but I imagine it means capturing everyone’s attention in the room, and speaking in a way that’s eloquent, yet relatable.',
+   reply:'It really comes down to connecting with those in the room in a real way. Being more interested, than interesting, and being your real self :)',
+   meta:'YouTube · 4 Sep 2026'},
+
+  {id:'thread-kindness', kind:'thread', platform:'youtube', tone:'normal',
+   eyebrow:'Real exchange', author:'Kate Thayer', handle:'@katethayer4633',
+   body:'There was a tremendous response of people coming together, helping others in any way they could on that day. But why should it only happen in the event of a tragedy?',
+   reply:'Exactly! ❤️ Why wait for a tragedy to remind us how much we need each other? Every little act of kindness matters.',
+   meta:'YouTube · 16 Sep 2026'},
+
+  {id:'thread-rules', kind:'thread', platform:'youtube', tone:'normal',
+   eyebrow:'Real exchange', author:'Kate Thayer', handle:'@katethayer4633',
+   body:'I can think of a few people, especially in my workplace, who could benefit from these five rules of engagement.',
+   reply:'Wow thank you so much for sharing, because what you mentioned is so common and happens to us all the time in conversations! 🫶',
+   meta:'YouTube · 2 May 2026'},
+
+  {id:'thread-family', kind:'thread', platform:'youtube', tone:'normal',
+   eyebrow:'Real exchange', author:'Majo B', handle:'@majob2363',
+   body:'Beautiful family & friends 🎉🎉🎉',
+   reply:'Thank you!! ❤️ They really are! So grateful for the beautiful people and moments that remind us what connection is all about. 🎉🥰',
+   meta:'YouTube · 21 Sep 2026'},
+
+  {id:'thread-fun', kind:'thread', platform:'youtube', tone:'normal',
+   eyebrow:'Real exchange', author:'Hypa', handle:'@Hypaisalittleweirdo',
+   body:'That seems like fun',
+   reply:'It is!! 😂❤️ Life is too short not to have a little fun… especially when dessert is involved! 🍪💃🏻',
+   meta:'YouTube · 21 Sep 2026'}
 ];
+
+var THREADNOTE='<b>Both sides are real.</b> The comment and Renée’s reply are taken from the public thread. Obvious typos are corrected and long comments trimmed for the frame — nothing substantive is changed, and no wording is invented.';
 
 var NOTES={
   'li-impressions':'<b>This card is intentionally blank.</b> LinkedIn only shows impressions to the account owner, so there was nothing to read. Get it from LinkedIn → Me → Posts &amp; Activity → Analytics → Impressions, type it in, and set the date.',
@@ -282,6 +323,19 @@ function layout(c,card,fm){
     for(i=0;i<card.rows.length;i++){
       push({t:'row',row:card.rows[i],max:max,h:Math.round(84*S),gap:i===card.rows.length-1?0:Math.round(14*S)});
     }
+  } else if(card.kind==='thread'){
+    ls(c,3*S); c.font=F(600,Math.round(24*S),ARCH);
+    push({t:'eyebrow',text:card.eyebrow.toUpperCase(),color:PLAT[card.platform].color,size:Math.round(24*S),h:Math.round(24*S),gap:Math.round(28*S)});
+    push({t:'author',author:card.author,handle:card.handle,h:Math.round(74*S),gap:Math.round(24*S)});
+    ls(c,0); c.font=F(400,Math.round(36*S),ARCH);
+    var tl=wrapText(c,card.body,innerW), tlh=Math.round(50*S);
+    push({t:'body',lines:tl,lh:tlh,size:Math.round(36*S),h:tl.length*tlh,gap:Math.round(30*S)});
+    var ind=Math.round(78*S), rw=innerW-ind, headH=Math.round(64*S), rgap=Math.round(18*S);
+    c.font=F(400,Math.round(33*S),ARCH);
+    var rl=wrapText(c,card.reply,rw), rlh=Math.round(46*S);
+    push({t:'reply',lines:rl,lh:rlh,size:Math.round(33*S),indent:ind,headH:headH,rgap:rgap,
+          h:headH+rgap+rl.length*rlh,gap:Math.round(32*S)});
+
   } else if(card.kind==='comment'){
     ls(c,3*S); c.font=F(600,Math.round(24*S),ARCH);
     push({t:'eyebrow',text:card.eyebrow.toUpperCase(),color:PLAT[card.platform].color,size:Math.round(24*S),h:Math.round(24*S),gap:Math.round(30*S)});
@@ -321,13 +375,23 @@ function layout(c,card,fm){
 }
 
 /* ---------- draw ---------- */
-function drawCard(c,card,fm){
-  var S=fm.S;
-  c.clearRect(0,0,fm.w,fm.h);
+function drawCard(c,card,fm0){
+  c.clearRect(0,0,fm0.w,fm0.h);
   c.textBaseline='alphabetic';
 
-  var L=layout(c,card,fm);
-  var plateH=L.contentH+L.pad*2;
+  /* Threads run to wildly different lengths. Shrink the type until the plate
+     fits the frame's safe area instead of letting a long one run off the top. */
+  var topSafe = fm0.h>fm0.w ? 130 : 70;
+  var maxH = fm0.bottom-topSafe, fm, L, plateH, mul=1;
+  for(var k=0;k<10;k++){
+    fm={w:fm0.w,h:fm0.h,plateX:fm0.plateX,plateW:fm0.plateW,
+        bottom:fm0.bottom,S:fm0.S*mul,label:fm0.label};
+    L=layout(c,card,fm);
+    plateH=L.contentH+L.pad*2;
+    if(plateH<=maxH || mul<0.55) break;
+    mul*=0.93;
+  }
+  var S=fm.S;
   var px=fm.plateX, py=fm.bottom-plateH, pw=fm.plateW;
 
   /* plate */
@@ -402,6 +466,42 @@ function drawCard(c,card,fm){
       c.font=F(400,b.size,ARCH); c.fillStyle=PAPER;
       for(j=0;j<b.lines.length;j++) c.fillText(b.lines[j],x,y+b.lh*j+b.size*0.84);
 
+    }else if(b.t==='reply'){
+      c.fillStyle='rgba(23,160,140,0.42)';
+      rr(c,x+Math.round(26*S),y,Math.round(5*S),b.h,Math.round(3*S)); c.fill();
+
+      var rx=x+b.indent, rav=Math.round(56*S), r2=rav/2;
+      var hasPic = AVATAR && AVATAR.complete && AVATAR.naturalWidth>0;
+      c.save();
+      c.beginPath(); c.arc(rx+r2,y+r2,r2,0,Math.PI*2); c.closePath(); c.clip();
+      if(hasPic) c.drawImage(AVATAR,rx,y,rav,rav);
+      else { c.fillStyle=EMBER; c.fillRect(rx,y,rav,rav); }
+      c.restore();
+      if(!hasPic){
+        c.font=F(700,Math.round(26*S),ARCH); c.fillStyle='#2A1004'; c.textAlign='center';
+        c.fillText('R',rx+r2,y+r2+Math.round(9*S)); c.textAlign='left';
+      }
+
+      var nx=rx+rav+Math.round(16*S);
+      c.font=F(700,Math.round(28*S),ARCH); c.fillStyle=PAPER;
+      c.fillText(RENEE.name,nx,y+Math.round(26*S));
+      var nw=c.measureText(RENEE.name).width;
+
+      /* creator marker — names the relationship, not a copy of platform chrome */
+      ls(c,1.5*S); c.font=F(700,Math.round(16*S),ARCH);
+      var pt='CREATOR', pw2=c.measureText(pt).width+Math.round(22*S), ph=Math.round(27*S);
+      c.fillStyle='rgba(23,160,140,0.22)';
+      rr(c,nx+nw+Math.round(14*S),y+Math.round(2*S),pw2,ph,ph/2); c.fill();
+      c.fillStyle=TEAL;
+      c.fillText(pt,nx+nw+Math.round(25*S),y+Math.round(20*S)); ls(c,0);
+
+      c.font=F(400,Math.round(23*S),ARCH); c.fillStyle=MUTE;
+      c.fillText(RENEE.handle,nx,y+Math.round(57*S));
+
+      c.font=F(400,b.size,ARCH); c.fillStyle='rgba(250,247,242,0.93)';
+      var ry=y+b.headH+b.rgap;
+      for(j=0;j<b.lines.length;j++) c.fillText(b.lines[j],rx,ry+b.lh*j+b.size*0.84);
+
     }else if(b.t==='row'){
       var ro=b.row, dot=Math.round(13*S);
       c.beginPath(); c.arc(x+dot/2,y+Math.round(15*S),dot/2,0,Math.PI*2); c.closePath();
@@ -460,6 +560,18 @@ function save(){
 }
 function cur(){ return cards.filter(function(c){return c.id===selected;})[0]; }
 
+var AVKEY='marinoAvatarV1';
+function applyAvatar(dataUrl,persist){
+  var img=new Image();
+  img.onload=function(){ AVATAR=img; renderFields(); paint(); };
+  img.onerror=function(){ AVATAR=null; };
+  img.src=dataUrl;
+  if(persist){ try{ localStorage.setItem(AVKEY,dataUrl); }catch(e){} }
+}
+function loadAvatar(){
+  try{ var d=localStorage.getItem(AVKEY); if(d) applyAvatar(d,false); }catch(e){}
+}
+
 /* ---------- ui ---------- */
 var listEl=document.getElementById('list'),
     fieldsEl=document.getElementById('fields'),
@@ -495,9 +607,42 @@ function field(key,label,multiline,hint){
   fieldsEl.appendChild(w);
 }
 
+function avatarField(){
+  var w=document.createElement('div');
+  var l=document.createElement('label'); l.htmlFor='f-avatar'; l.textContent='Renée’s photo (optional)';
+  var inp=document.createElement('input');
+  inp.type='file'; inp.id='f-avatar'; inp.accept='image/*';
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0]; if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){ applyAvatar(String(fr.result),true); };
+    fr.readAsDataURL(f);
+  };
+  w.appendChild(l); w.appendChild(inp);
+  var h=document.createElement('div'); h.className='hint';
+  h.textContent = AVATAR ? 'Loaded — used on every reply card.'
+                         : 'Without one, her replies use an “R” monogram.';
+  w.appendChild(h);
+  if(AVATAR){
+    var b=document.createElement('button');
+    b.className='btn ghost'; b.textContent='Remove photo'; b.style.marginTop='8px';
+    b.onclick=function(){
+      AVATAR=null; try{ localStorage.removeItem(AVKEY); }catch(e){}
+      renderFields(); paint();
+    };
+    w.appendChild(b);
+  }
+  fieldsEl.appendChild(w);
+}
+
 function renderFields(){
   var cd=cur(); fieldsEl.innerHTML='';
-  if(cd.kind==='comment'){
+  if(cd.kind==='thread'){
+    field('eyebrow','Eyebrow'); field('author','Commenter'); field('handle','Handle');
+    field('body','Their comment',true);
+    field('reply','Renée’s reply',true,'Verbatim from the thread.');
+    avatarField();
+  }else if(cd.kind==='comment'){
     field('eyebrow','Eyebrow'); field('author','Name'); field('handle','Handle');
     field('body','Comment',true,'Reproduced verbatim from the public thread.');
   }else if(cd.kind==='rank'){
@@ -508,7 +653,8 @@ function renderFields(){
     field('unit','Unit'); field('context','Context',true);
   }
   field('meta','Source line',false,'Keep the platform and the as-of date.');
-  if(NOTES[cd.id]){ noteEl.hidden=false; noteEl.innerHTML=NOTES[cd.id]; } else noteEl.hidden=true;
+  var nh = NOTES[cd.id] || (cd.kind==='thread' ? THREADNOTE : null);
+  if(nh){ noteEl.hidden=false; noteEl.innerHTML=nh; } else noteEl.hidden=true;
 }
 
 function paint(){
@@ -557,7 +703,7 @@ document.getElementById('reset').onclick=function(){
   renderList(); renderFields(); paint();
 };
 
-load(); renderList(); renderFields();
+load(); loadAvatar(); renderList(); renderFields();
 if(document.fonts&&document.fonts.ready){
   Promise.all([
     document.fonts.load('900 176px Fraunces'),

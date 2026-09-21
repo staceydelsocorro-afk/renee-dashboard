@@ -28,9 +28,21 @@ already cut.
 | `li-impressions` | *blank template* | **not sourced — see below** | — |
 | `audience-rank` | 5-platform stack | mixed, per row | per row |
 | `comment-*` | verbatim | YouTube public comments | date on card |
+| `thread-*` | verbatim, both sides | YouTube public threads | date on card |
 
-Comment cards reproduce real comments verbatim, with the commenter's real handle.
-Nothing is paraphrased or invented.
+**Comment cards** (`comment-*`) show one audience comment, with the commenter's real
+handle.
+
+**Reply cards** (`thread-*`) show the exchange: the comment, then Renée's actual reply
+beneath it, marked `CREATOR`. Both halves are taken from the public thread.
+
+On both, obvious typos are corrected and long comments trimmed to fit the frame.
+Nothing substantive is changed and no wording is invented — if a line is on a card,
+someone really wrote it.
+
+Her replies use an “R” monogram by default. To use her headshot instead, open
+`studio.html`, pick any `thread-*` card, and choose a file under **Renée's photo**;
+it applies to every reply card and is remembered in that browser.
 
 ## The one number that isn't here
 
@@ -48,7 +60,8 @@ To fill either one: open `studio.html`, pick the card, type the figure from
 
 Open it in a browser — locally, or via GitHub Pages at `/overlays/studio.html`.
 
-- Edit any card's figures, labels and comment text
+- Edit any card's figures, labels, comment text and replies
+- Drop in Renée's headshot for the reply cards
 - Toggle vertical / horizontal
 - Download a single card, or the whole set, as transparent PNGs
 - Edits persist in the browser; **Reset** restores the verified values
