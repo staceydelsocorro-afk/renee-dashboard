@@ -1,0 +1,738 @@
+<title>Marino Screenshot Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Roboto:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F0EA; --surface:#FFF; --line:#E0DACF; --text:#1B1815; --dim:#6E665C;
+  --field:#FFF; --fieldline:#D6CFC3; --ink:#12100E; --paper:#FAF7F2; --gold:#E8B647; --teal:#17A08C;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#141210; --surface:#1E1B18; --line:#332E28; --text:#F2EEE7; --dim:#9A9186;
+  --field:#26221E; --fieldline:#3D3730;
+}}
+:root[data-theme="dark"]{
+  --bg:#141210; --surface:#1E1B18; --line:#332E28; --text:#F2EEE7; --dim:#9A9186;
+  --field:#26221E; --fieldline:#3D3730;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  padding-inline:20px; padding-block:28px 56px; max-width:1240px; margin:0 auto; line-height:1.5;
+}
+h1{font-size:29px;font-weight:700;letter-spacing:-.7px;line-height:1.15}
+.lede{color:var(--dim);font-size:14.5px;margin-top:7px;max-width:64ch}
+.rule{height:1px;background:var(--line);margin:22px 0 24px;border:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.seg{display:flex;border:1px solid var(--fieldline);border-radius:9px;overflow:hidden;background:var(--field)}
+.seg button{background:transparent;border:0;color:var(--dim);font:600 12.5px Inter,sans-serif;padding:9px 15px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.btn{background:var(--ink);color:var(--paper);border:0;border-radius:9px;cursor:pointer;font:600 12.5px Inter,sans-serif;padding:10px 16px}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--fieldline)}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,textarea:focus-visible,.cardlist button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:240px minmax(0,1fr) 290px;gap:22px;align-items:start}
+@media (max-width:1000px){.wrap{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px}
+.panel h2{font:600 10.5px Inter,sans-serif;text-transform:uppercase;letter-spacing:1.6px;color:var(--dim);margin-bottom:11px}
+.cardlist{display:flex;flex-direction:column;gap:2px;max-height:540px;overflow-y:auto}
+.cardlist button{text-align:left;background:transparent;border:0;border-radius:7px;cursor:pointer;color:var(--text);font:500 13px Inter,sans-serif;padding:8px 10px;display:flex;align-items:center;gap:9px;width:100%}
+.cardlist button:hover{background:var(--bg)}
+.cardlist button[aria-current="true"]{background:var(--ink);color:var(--paper)}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.cardlist .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{font:600 9px Inter,sans-serif;letter-spacing:.7px;text-transform:uppercase;padding:2px 5px;border-radius:4px;flex:none;background:var(--gold);color:#2A2008}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px;display:flex;flex-direction:column;align-items:center;gap:13px}
+.checker{width:100%;border-radius:9px;overflow:hidden;line-height:0;background-color:#CFCAC2;
+  background-image:linear-gradient(45deg,#B6B0A6 25%,transparent 25%,transparent 75%,#B6B0A6 75%),linear-gradient(45deg,#B6B0A6 25%,transparent 25%,transparent 75%,#B6B0A6 75%);
+  background-size:22px 22px;background-position:0 0,11px 11px}
+#preview{display:block;width:100%;height:auto;max-width:100%}
+.stagemeta{font-size:11.5px;color:var(--dim);text-align:center}
+.fields{display:flex;flex-direction:column;gap:13px}
+label{display:block;font:600 10.5px Inter,sans-serif;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin-bottom:5px}
+input,textarea{width:100%;background:var(--field);border:1px solid var(--fieldline);border-radius:8px;color:var(--text);font:400 13.5px Inter,sans-serif;padding:9px 11px;resize:vertical}
+.hint{font-size:11.5px;color:var(--dim);line-height:1.5;margin-top:3px}
+.note{background:color-mix(in srgb,var(--gold) 16%,var(--surface));border:1px solid color-mix(in srgb,var(--gold) 45%,var(--line));border-radius:9px;padding:11px 13px;font-size:12.5px;line-height:1.55;margin-top:14px}
+.src{margin-top:26px;font-size:12px;color:var(--dim);line-height:1.65}
+.src code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+</style>
+
+<h1>Marino Screenshot Cards</h1>
+<p class="lede">Post, profile and comment screenshots rebuilt in each platform's own interface and
+typeface — LinkedIn in Source Sans, YouTube in Roboto, Instagram in Inter — carrying her real
+figures and real comments. Transparent PNGs, ready to scale and place over footage.</p>
+<hr class="rule">
+
+<div class="bar">
+  <div class="seg" role="group" aria-label="Interface theme">
+    <button id="th-light" aria-pressed="true">Light</button>
+    <button id="th-dark" aria-pressed="false">Dark</button>
+  </div>
+  <button class="btn" id="dl">Download this screenshot</button>
+  <button class="btn ghost" id="dlall">Download all (both themes)</button>
+  <button class="btn ghost" id="reset">Reset to verified values</button>
+</div>
+
+<div class="wrap">
+  <div class="panel"><h2>Screenshots</h2><div class="cardlist" id="list"></div></div>
+  <div class="stage">
+    <div class="checker"><canvas id="preview" width="800" height="400"></canvas></div>
+    <div class="stagemeta" id="stagemeta"></div>
+  </div>
+  <div class="panel">
+    <h2>Edit</h2>
+    <div class="fields" id="fields"></div>
+    <div class="note" id="note" hidden></div>
+  </div>
+</div>
+
+<div class="src">
+  <b>Sources.</b> YouTube figures from channel <code>UCsSkET6muRFdrKhnW2yyr7g</code> and video
+  <code>0RVqSBisvHU</code>, read 21 Sep 2026. Instagram from <code>@iamreneemarino</code>, same date.
+  LinkedIn followers from the May 2026 dashboard snapshot. Comments and replies are verbatim from
+  public YouTube threads. LinkedIn impressions are not readable without the account owner's login,
+  so that card ships blank.
+</div>
+
+<script>
+/* ============ platform themes ============ */
+var TH={
+  linkedin:{
+    light:{bg:'#FFFFFF',text:'#000000',sub:'rgba(0,0,0,0.60)',faint:'rgba(0,0,0,0.45)',
+           accent:'#0A66C2',line:'#E0DFDC',chip:'#EDF3F8',avatar:'#D9C6B0'},
+    dark: {bg:'#1B1F23',text:'#FFFFFF',sub:'rgba(255,255,255,0.60)',faint:'rgba(255,255,255,0.45)',
+           accent:'#70B5F9',line:'#38434F',chip:'#28313B',avatar:'#4A5A67'}
+  },
+  instagram:{
+    light:{bg:'#FFFFFF',text:'#000000',sub:'#737373',faint:'#A8A8A8',
+           accent:'#0095F6',line:'#DBDBDB',chip:'#EFEFEF',avatar:'#D9C6B0'},
+    dark: {bg:'#000000',text:'#FFFFFF',sub:'#A8A8A8',faint:'#737373',
+           accent:'#0095F6',line:'#262626',chip:'#262626',avatar:'#3A3A3A'}
+  },
+  youtube:{
+    light:{bg:'#FFFFFF',text:'#0F0F0F',sub:'#606060',faint:'#909090',
+           accent:'#065FD4',line:'#E5E5E5',chip:'#F2F2F2',avatar:'#D9C6B0'},
+    dark: {bg:'#0F0F0F',text:'#F1F1F1',sub:'#AAAAAA',faint:'#717171',
+           accent:'#3EA6FF',line:'#303030',chip:'#272727',avatar:'#4A4A4A'}
+  }
+};
+var FONT={linkedin:'"Source Sans 3", "Source Sans Pro", Helvetica, Arial, sans-serif',
+          instagram:'Inter, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif',
+          youtube:'Roboto, Arial, Helvetica, sans-serif'};
+var PLATDOT={linkedin:'#0A66C2',instagram:'#E1306C',youtube:'#FF0000'};
+var W=1080, PAD=44, SHAD=40;
+var AVATAR=null;
+
+/* ============ canvas helpers ============ */
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);
+  c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);
+  c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+function f(w,s,fam){return w+' '+s+'px '+fam;}
+function wrap(c,t,maxW){
+  var words=String(t).replace(/\s+/g,' ').trim().split(' '),lines=[],cur='';
+  for(var i=0;i<words.length;i++){var tr=cur?cur+' '+words[i]:words[i];
+    if(c.measureText(tr).width>maxW&&cur){lines.push(cur);cur=words[i];}else cur=tr;}
+  if(cur)lines.push(cur);return lines;}
+function lines(c,arr,x,y,lh,size){for(var i=0;i<arr.length;i++)c.fillText(arr[i],x,y+lh*i+size*0.78);return arr.length*lh;}
+
+var CREATOR_FILL='#C2612B';
+function avatar(c,x,y,s,name,T,forceFill){
+  var has=AVATAR&&AVATAR.complete&&AVATAR.naturalWidth>0;
+  c.save();c.beginPath();c.arc(x+s/2,y+s/2,s/2,0,Math.PI*2);c.closePath();c.clip();
+  if(has)c.drawImage(AVATAR,x,y,s,s);
+  else{var pal=['#B4886B','#8E9E7A','#A67C8E','#7B8FA3','#B39256','#89806F'];
+       c.fillStyle=forceFill||pal[(name?name.charCodeAt(0):0)%pal.length];c.fillRect(x,y,s,s);}
+  c.restore();
+  if(!has){c.save();c.font=f(500,Math.round(s*0.42),'Inter, sans-serif');c.fillStyle='rgba(255,255,255,0.95)';
+    c.textAlign='center';c.fillText((name||'?').replace(/^@/,'').charAt(0).toUpperCase(),x+s/2,y+s/2+s*0.15);
+    c.textAlign='left';c.restore();}
+}
+
+/* ---- icons, drawn to a size box ---- */
+function thumbUp(c,x,y,s,col,flip){
+  c.save();c.translate(x+s/2,y+s/2);if(flip)c.scale(1,-1);c.translate(-s/2,-s/2);
+  c.strokeStyle=col;c.fillStyle=col;c.lineWidth=s*0.085;c.lineJoin='round';
+  c.beginPath();                                   /* cuff */
+  rr(c,s*0.02,s*0.44,s*0.24,s*0.52,s*0.05);c.stroke();
+  c.beginPath();                                   /* palm + thumb */
+  c.moveTo(s*0.33,s*0.96);
+  c.lineTo(s*0.33,s*0.45);
+  c.lineTo(s*0.52,s*0.06);
+  c.quadraticCurveTo(s*0.70,s*0.02,s*0.66,s*0.24);
+  c.lineTo(s*0.60,s*0.42);
+  c.lineTo(s*0.90,s*0.42);
+  c.quadraticCurveTo(s*1.00,s*0.44,s*0.96,s*0.56);
+  c.lineTo(s*0.84,s*0.92);
+  c.quadraticCurveTo(s*0.80,s*0.96,s*0.72,s*0.96);
+  c.closePath();c.stroke();c.restore();
+}
+function heartIcon(c,x,y,s,col,filled){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=s*0.09;c.lineJoin='round';
+  c.beginPath();
+  c.moveTo(x+s*0.5,y+s*0.90);
+  c.bezierCurveTo(x+s*0.06,y+s*0.58, x+s*0.02,y+s*0.26, x+s*0.22,y+s*0.14);
+  c.bezierCurveTo(x+s*0.38,y+s*0.04, x+s*0.5,y+s*0.20, x+s*0.5,y+s*0.30);
+  c.bezierCurveTo(x+s*0.5,y+s*0.20, x+s*0.62,y+s*0.04, x+s*0.78,y+s*0.14);
+  c.bezierCurveTo(x+s*0.98,y+s*0.26, x+s*0.94,y+s*0.58, x+s*0.5,y+s*0.90);
+  c.closePath();filled?c.fill():c.stroke();c.restore();
+}
+function bubble(c,x,y,s,col){
+  c.save();c.strokeStyle=col;c.lineWidth=s*0.09;c.lineJoin='round';
+  c.beginPath();c.arc(x+s*0.5,y+s*0.46,s*0.42,Math.PI*0.72,Math.PI*0.28);
+  c.lineTo(x+s*0.24,y+s*0.94);c.lineTo(x+s*0.20,y+s*0.70);
+  c.stroke();c.restore();
+}
+function plane(c,x,y,s,col){
+  c.save();c.strokeStyle=col;c.lineWidth=s*0.09;c.lineJoin='round';
+  c.beginPath();c.moveTo(x+s*0.96,y+s*0.06);c.lineTo(x+s*0.04,y+s*0.42);
+  c.lineTo(x+s*0.44,y+s*0.56);c.lineTo(x+s*0.58,y+s*0.96);c.closePath();c.stroke();
+  c.beginPath();c.moveTo(x+s*0.96,y+s*0.06);c.lineTo(x+s*0.44,y+s*0.56);c.stroke();c.restore();
+}
+function bookmark(c,x,y,s,col){
+  c.save();c.strokeStyle=col;c.lineWidth=s*0.09;c.lineJoin='round';
+  c.beginPath();c.moveTo(x+s*0.16,y+s*0.06);c.lineTo(x+s*0.84,y+s*0.06);
+  c.lineTo(x+s*0.84,y+s*0.94);c.lineTo(x+s*0.5,y+s*0.64);c.lineTo(x+s*0.16,y+s*0.94);
+  c.closePath();c.stroke();c.restore();
+}
+function verified(c,x,y,s,col){
+  c.save();c.fillStyle=col;c.beginPath();
+  var n=8,R=s*0.5,r=s*0.40;
+  for(var i=0;i<n*2;i++){var a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;
+    c[i?'lineTo':'moveTo'](x+s/2+Math.cos(a)*rad,y+s/2+Math.sin(a)*rad);}
+  c.closePath();c.fill();
+  c.strokeStyle='#FFF';c.lineWidth=s*0.11;c.lineCap='round';c.lineJoin='round';
+  c.beginPath();c.moveTo(x+s*0.30,y+s*0.52);c.lineTo(x+s*0.44,y+s*0.66);c.lineTo(x+s*0.72,y+s*0.36);
+  c.stroke();c.restore();
+}
+function globe(c,x,y,s,col){
+  c.save();c.strokeStyle=col;c.lineWidth=s*0.08;
+  c.beginPath();c.arc(x+s/2,y+s/2,s*0.45,0,Math.PI*2);c.stroke();
+  c.beginPath();c.ellipse(x+s/2,y+s/2,s*0.20,s*0.45,0,0,Math.PI*2);c.stroke();
+  c.beginPath();c.moveTo(x+s*0.06,y+s/2);c.lineTo(x+s*0.94,y+s/2);c.stroke();c.restore();
+}
+function dots(c,x,y,s,col){
+  c.save();c.fillStyle=col;
+  for(var i=0;i<3;i++){c.beginPath();c.arc(x+s*0.5,y+s*(0.18+i*0.32),s*0.085,0,Math.PI*2);c.fill();}
+  c.restore();
+}
+/* YouTube's "hearted by creator" marker: the creator's avatar as a small badge
+   on the commenter's avatar, with a red heart on its corner. */
+function heartBadge(c,x,y,av,T){
+  var bs=Math.round(av*0.46), bx=x+av-bs*0.86, by=y+av-bs*0.86;
+  var has=AVATAR&&AVATAR.complete&&AVATAR.naturalWidth>0;
+  c.save();
+  c.beginPath();c.arc(bx+bs/2,by+bs/2,bs/2+Math.round(bs*0.09),0,Math.PI*2);c.closePath();
+  c.fillStyle=T.bg;c.fill();
+  c.restore();
+  c.save();
+  c.beginPath();c.arc(bx+bs/2,by+bs/2,bs/2,0,Math.PI*2);c.closePath();c.clip();
+  if(has)c.drawImage(AVATAR,bx,by,bs,bs);
+  else{c.fillStyle='#C2612B';c.fillRect(bx,by,bs,bs);}
+  c.restore();
+  if(!has){
+    c.save();c.font=f(600,Math.round(bs*0.52),'Inter, sans-serif');
+    c.fillStyle='#FFF';c.textAlign='center';
+    c.fillText('R',bx+bs/2-bs*0.04,by+bs/2+bs*0.17);c.textAlign='left';c.restore();
+  }
+  var hs=Math.round(bs*0.58), hx=bx+bs-hs*0.46, hy=by+bs-hs*0.54;
+  c.save();
+  c.beginPath();c.arc(hx+hs/2,hy+hs/2,hs*0.72,0,Math.PI*2);c.closePath();
+  c.fillStyle=T.bg;c.fill();c.restore();
+  heartIcon(c,hx,hy,hs,'#FF0033',true);
+}
+
+function pillBtn(c,x,y,w,h,fill,label,labelCol,fam,size){
+  c.save();c.fillStyle=fill;rr(c,x,y,w,h,h/2);c.fill();
+  c.font=f(600,size,fam);c.fillStyle=labelCol;c.textAlign='center';
+  c.fillText(label,x+w/2,y+h/2+size*0.35);c.textAlign='left';c.restore();
+}
+function outlineBtn(c,x,y,w,h,col,label,fam,size){
+  c.save();c.strokeStyle=col;c.lineWidth=2;rr(c,x,y,w,h,h/2);c.stroke();
+  c.font=f(600,size,fam);c.fillStyle=col;c.textAlign='center';
+  c.fillText(label,x+w/2,y+h/2+size*0.35);c.textAlign='left';c.restore();
+}
+
+/* ============ card drawers — each returns the content height ============ */
+function dYtComment(c,d,T,F,indent,small){
+  var x=PAD+indent, w=W-PAD*2-indent, y=PAD, av=small?58:76, gap=small?20:24;
+  avatar(c,x,y,av,d.author,T,d.creator?CREATOR_FILL:null);
+  if(d.hearted) heartBadge(c,x,y,av,T);
+  var tx=x+av+gap, tw=w-av-gap;
+  var nameS=small?25:27;
+  c.font=f(500,nameS,F); 
+  if(d.creator){
+    var nw=c.measureText(d.handle).width, ph=nameS+16;
+    c.fillStyle=T.text==='#0F0F0F'?'#0F0F0F':'#F1F1F1';
+    rr(c,tx-12,y-2,nw+24,ph,ph/2);c.fill();
+    c.fillStyle=T.bg;c.fillText(d.handle,tx,y+nameS*0.80+6);
+    c.font=f(400,nameS-2,F);c.fillStyle=T.sub;
+    c.fillText(d.when,tx+nw+26,y+nameS*0.80+6);
+    y+=ph+10;
+  }else{
+    c.fillStyle=T.text;c.fillText(d.handle,tx,y+nameS*0.80);
+    var hw=c.measureText(d.handle).width;
+    c.font=f(400,nameS-2,F);c.fillStyle=T.sub;
+    c.fillText(d.when,tx+hw+16,y+nameS*0.80);
+    y+=nameS+18;
+  }
+  var bs=small?29:31, blh=small?42:45;
+  c.font=f(400,bs,F);c.fillStyle=T.text;
+  y+=lines(c,wrap(c,d.body,tw),tx,y,blh,bs)+16;
+  var ic=small?30:33;
+  thumbUp(c,tx,y,ic,T.sub,false);
+  c.font=f(400,small?22:24,F);c.fillStyle=T.sub;
+  if(d.likes)c.fillText(d.likes,tx+ic+14,y+ic*0.72);
+  var lw=d.likes?c.measureText(d.likes).width+14:6;
+  thumbUp(c,tx+ic+lw+34,y,ic,T.sub,true);
+  c.font=f(500,small?23:25,F);c.fillStyle=T.sub;
+  c.fillText('Reply',tx+ic*2+lw+82,y+ic*0.74);
+  if(d.hearted){
+    var rhx=tx+ic*2+lw+82+c.measureText('Reply').width+Math.round(30);
+    heartIcon(c,rhx,y+Math.round(ic*0.10),Math.round(ic*0.80),'#FF0033',true);
+  }
+  y+=ic+(small?4:8);
+  if(d.replies){
+    y+=14;
+    c.save();c.fillStyle=T.accent;
+    c.beginPath();
+    c.moveTo(tx+4,y+8);c.lineTo(tx+20,y+18);c.lineTo(tx+4,y+28);c.closePath();c.fill();
+    c.font=f(500,small?23:25,F);
+    c.fillText(d.replies,tx+34,y+26);c.restore();
+    y+=36;
+  }
+  return y-PAD;
+}
+
+function dYtThread(c,d,T,F){
+  var h=dYtComment(c,{author:d.author,handle:d.handle,when:d.when,body:d.body,
+                      likes:d.likes,hearted:d.hearted},T,F,0,false);
+  var y=PAD+h+26;
+  /* creator reply, indented under the comment */
+  var saveY=PAD;
+  var sub=document.createElement('canvas');
+  /* draw reply in-place by temporarily shifting origin */
+  c.save();c.translate(0,y-PAD);
+  var rh=dYtComment(c,{author:'Renée Marino',handle:d.replyHandle,when:d.replyWhen,
+                       body:d.reply,likes:d.replyLikes,creator:true},T,F,104,true);
+  c.restore();
+  return (y-PAD)+rh;
+}
+
+function dYtVideo(c,d,T,F){
+  var x=PAD,y=PAD,w=W-PAD*2;
+  c.font=f(700,40,F);c.fillStyle=T.text;
+  y+=lines(c,wrap(c,d.title,w),x,y,52,40)+18;
+  c.font=f(400,28,F);c.fillStyle=T.sub;
+  c.fillText(d.views+' views  ·  '+d.when,x,y+22);
+  y+=54;
+  /* like / dislike chip */
+  var ch=64, cy=y;
+  c.fillStyle=T.chip;rr(c,x,cy,360,ch,ch/2);c.fill();
+  thumbUp(c,x+26,cy+17,30,T.text,false);
+  c.font=f(500,27,F);c.fillStyle=T.text;c.fillText(d.likes,x+70,cy+ch/2+9);
+  c.strokeStyle=T.line;c.lineWidth=2;
+  c.beginPath();c.moveTo(x+250,cy+16);c.lineTo(x+250,cy+ch-16);c.stroke();
+  thumbUp(c,x+292,cy+17,30,T.text,true);
+  /* comments chip */
+  c.fillStyle=T.chip;rr(c,x+384,cy,300,ch,ch/2);c.fill();
+  bubble(c,x+414,cy+17,30,T.text);
+  c.font=f(500,27,F);c.fillStyle=T.text;c.fillText(d.comments,x+458,cy+ch/2+9);
+  return y+ch-PAD;
+}
+
+function dYtChannel(c,d,T,F){
+  var x=PAD,y=PAD,av=132;
+  avatar(c,x,y,av,d.name,T);
+  var tx=x+av+30;
+  c.font=f(700,42,F);c.fillStyle=T.text;c.fillText(d.name,tx,y+40);
+  c.font=f(400,27,F);c.fillStyle=T.sub;
+  c.fillText(d.handle+'  ·  '+d.subs+'  ·  '+d.videos,tx,y+86);
+  c.font=f(400,26,F);c.fillStyle=T.sub;
+  c.fillText(d.views,tx,y+126);
+  var bw=250,bh=62;
+  pillBtn(c,W-PAD-bw,y+34,bw,bh,T.text,'Subscribe',T.bg,F,27);
+  return Math.max(av,150);
+}
+
+function dIgProfile(c,d,T,F){
+  var x=PAD,y=PAD,av=176;
+  avatar(c,x,y,av,d.name||'Renée',T);
+  var tx=x+av+46;
+  c.font=f(400,34,F);c.fillStyle=T.text;
+  c.fillText(d.handle,tx,y+34);
+  var hw=c.measureText(d.handle).width;
+  verified(c,tx+hw+14,y+4,34,T.accent);
+  pillBtn(c,tx+hw+70,y-2,180,52,T.chip,'Following',T.text,F,25);
+  pillBtn(c,tx+hw+262,y-2,170,52,T.chip,'Message',T.text,F,25);
+  var sy=y+96, sx=tx;
+  var st=[[d.posts,'posts'],[d.followers,'followers'],[d.following,'following']];
+  for(var i=0;i<st.length;i++){
+    c.font=f(600,30,F);c.fillStyle=T.text;c.fillText(st[i][0],sx,sy);
+    var nw=c.measureText(st[i][0]).width;
+    c.font=f(400,30,F);c.fillStyle=T.text;c.fillText(' '+st[i][1],sx+nw,sy);
+    sx+=nw+c.measureText(' '+st[i][1]).width+52;
+  }
+  var by=y+av+34;
+  c.font=f(600,29,F);c.fillStyle=T.text;
+  by+=lines(c,wrap(c,d.name,W-PAD*2),x,by,40,29);
+  c.font=f(400,29,F);c.fillStyle=T.text;
+  by+=lines(c,d.bio.split('\n'),x,by,40,29);
+  c.fillStyle=T.accent;
+  c.fillText(d.link,x,by+23);
+  return by+40-PAD;
+}
+
+function dLiProfile(c,d,T,F){
+  var x=PAD,y=PAD,av=160;
+  avatar(c,x,y,av,d.name,T);
+  var tx=x+av+34;
+  c.font=f(700,42,F);c.fillStyle=T.text;c.fillText(d.name,tx,y+40);
+  c.font=f(400,28,F);c.fillStyle=T.sub;
+  var hy=y+56;
+  hy+=lines(c,wrap(c,d.headline,W-PAD-tx),tx,hy,38,28);
+  c.font=f(400,26,F);c.fillStyle=T.faint;
+  c.fillText(d.location,tx,hy+22);
+  c.font=f(600,27,F);c.fillStyle=T.accent;
+  c.fillText(d.followers,tx,hy+68);
+  var by=Math.max(y+av,hy+96)+26;
+  pillBtn(c,x,by,206,62,T.accent,'Follow',T.bg,F,27);
+  outlineBtn(c,x+224,by,206,62,T.accent,'Message',F,27);
+  return by+62-PAD;
+}
+
+function dLiAnalytics(c,d,T,F){
+  var x=PAD,y=PAD,w=W-PAD*2;
+  c.font=f(700,36,F);c.fillStyle=T.text;c.fillText(d.title,x,y+34);
+  c.font=f(400,26,F);c.fillStyle=T.sub;
+  c.textAlign='right';c.fillText(d.range,W-PAD,y+32);c.textAlign='left';
+  y+=76;
+  c.strokeStyle=T.line;c.lineWidth=2;
+  c.beginPath();c.moveTo(x,y);c.lineTo(x+w,y);c.stroke();
+  y+=40;
+  if(d.value&&String(d.value).trim()){
+    c.font=f(700,96,F);c.fillStyle=T.text;c.fillText(d.value,x,y+80);
+    y+=112;
+  }else{
+    var sw=520,sh=112;
+    c.save();c.setLineDash([16,12]);c.lineWidth=3;c.strokeStyle='#C99A18';
+    rr(c,x,y,sw,sh,14);c.stroke();c.restore();
+    c.font=f(700,30,F);c.fillStyle='#C99A18';
+    c.fillText('YOUR FIGURE HERE',x+34,y+sh/2+11);
+    y+=sh+12;
+  }
+  c.font=f(400,30,F);c.fillStyle=T.sub;c.fillText(d.label,x,y+26);
+  y+=52;
+  globe(c,x,y,28,T.faint);
+  c.font=f(400,24,F);c.fillStyle=T.faint;c.fillText(d.foot,x+42,y+22);
+  return y+32-PAD;
+}
+
+var DRAW={'yt-comment':function(c,d,T,F){return dYtComment(c,d,T,F,0,false);},
+          'yt-thread':dYtThread,'yt-video':dYtVideo,'yt-channel':dYtChannel,
+          'ig-profile':dIgProfile,'li-profile':dLiProfile,'li-analytics':dLiAnalytics};
+
+/* ============ render one card to its own canvas ============ */
+function renderCard(card,theme){
+  var T=TH[card.platform][theme], F=FONT[card.platform];
+  var tmp=document.createElement('canvas');
+  tmp.width=W; tmp.height=4200;
+  var tc=tmp.getContext('2d'); tc.textBaseline='alphabetic';
+  var h=DRAW[card.kind](tc,card,T,F)+PAD*2;
+  h=Math.max(140,Math.round(h));
+
+  var out=document.createElement('canvas');
+  out.width=W+SHAD*2; out.height=h+SHAD*2;
+  var oc=out.getContext('2d');
+  oc.save();
+  oc.shadowColor='rgba(0,0,0,0.34)';oc.shadowBlur=38;oc.shadowOffsetY=14;
+  oc.fillStyle=T.bg; rr(oc,SHAD,SHAD,W,h,22); oc.fill();
+  oc.restore();
+  oc.save(); rr(oc,SHAD,SHAD,W,h,22); oc.clip();
+  oc.drawImage(tmp,0,0,W,h,SHAD,SHAD,W,h);
+  oc.restore();
+  return out;
+}
+window.renderCard=renderCard;
+
+/* ============ verified card data ============ */
+var BASE=[
+ {id:'yt-video',kind:'yt-video',platform:'youtube',
+  title:'Something changed in 2010… and it’s scary…. Watch this…',
+  views:'3,077,079',when:'Mar 4, 2026',likes:'184,671',comments:'11,042'},
+
+ {id:'yt-channel',kind:'yt-channel',platform:'youtube',
+  name:'Renée Marino',handle:'@iamreneemarino',subs:'15.2K subscribers',
+  videos:'297 videos',views:'3,239,159 total views'},
+
+ {id:'ig-profile',kind:'ig-profile',platform:'instagram',
+  handle:'iamreneemarino',posts:'2.4K',followers:'23.4K',following:'3.2K',
+  name:'Renée Marino-Keynote Speaker/Connection Expert/Author✨',
+  bio:'🎤International Keynote Speaker | Connection Expert\n📖 Best-selling Author | “Mary” in Jersey Boys Film🎬',
+  link:'reneemarino.com'},
+
+ {id:'li-profile',kind:'li-profile',platform:'linkedin',
+  name:'Renée Marino',
+  headline:'International Keynote Speaker | Connection Expert | Best-selling Author',
+  location:'United States',followers:'5,093 followers'},
+
+ {id:'li-impressions',kind:'li-analytics',platform:'linkedin',
+  title:'Post impressions',range:'Past 30 days',value:'',label:'impressions',
+  foot:'Anyone on or off LinkedIn'},
+
+ {id:'yt-comment-pause',kind:'yt-comment',platform:'youtube',
+  author:'Michael Lopez Calleja',handle:'@michaellopezcalleja',when:'6 days ago',
+  body:'The power of the pause!',likes:''},
+
+ {id:'yt-comment-parrot',kind:'yt-comment',platform:'youtube',
+  author:'Margo Vallen',handle:'@margovallen',when:'4 months ago',
+  body:'Everybody, and their pet parrot.. has a cell phone. Social media, for many.. are the only friends they have.',likes:''},
+
+ {id:'yt-comment-workplace',kind:'yt-comment',platform:'youtube',
+  author:'Kate Thayer',handle:'@katethayer4633',when:'4 months ago',
+  body:'I can think of a few people, especially in my workplace, who could benefit from these five rules of engagement.',likes:'1'},
+
+ {id:'yt-comment-room',kind:'yt-comment',platform:'youtube',
+  author:'Kate Thayer',handle:'@katethayer4633',when:'2 weeks ago',
+  body:'I don’t think I have ever owned a room in my life, but I imagine it means capturing everyone’s attention in the room, and speaking in a way that’s eloquent, yet relatable.',likes:''},
+
+ {id:'yt-comment-reel',kind:'yt-comment',platform:'youtube',
+  author:'Riding the Trauma Train',handle:'@ridingthetraumatrain',when:'3 months ago',
+  body:'WOW!!! What a reel!!!! 💚💚💚',likes:''},
+
+ {id:'yt-comment-chills',kind:'yt-comment',platform:'youtube',
+  author:'Riding the Trauma Train',handle:'@ridingthetraumatrain',when:'2 months ago',
+  body:'Still get chills ‘looking back at me’ 💚',likes:''},
+
+ {id:'yt-thread-pause',kind:'yt-thread',platform:'youtube',
+  author:'Michael Lopez Calleja',handle:'@michaellopezcalleja',when:'6 days ago',
+  body:'The power of the pause!',likes:'',
+  replyHandle:'@iamreneemarino',replyWhen:'6 days ago',replyLikes:'',
+  reply:'Yes!! 🙌 The pause can say so much. Sometimes slowing down and really being present is exactly what the conversation needs. ❤️'},
+
+ {id:'yt-thread-room',kind:'yt-thread',platform:'youtube',
+  author:'Kate Thayer',handle:'@katethayer4633',when:'2 weeks ago',
+  body:'I don’t think I have ever owned a room in my life, but I imagine it means capturing everyone’s attention in the room, and speaking in a way that’s eloquent, yet relatable.',likes:'',
+  replyHandle:'@iamreneemarino',replyWhen:'2 weeks ago',replyLikes:'1',
+  reply:'It really comes down to connecting with those in the room in a real way. Being more interested, than interesting, and being your real self :)'},
+
+ {id:'yt-thread-kindness',kind:'yt-thread',platform:'youtube',
+  author:'Kate Thayer',handle:'@katethayer4633',when:'1 week ago',
+  body:'There was a tremendous response of people coming together, helping others in any way they could on that day. But why should it only happen in the event of a tragedy?',likes:'',
+  replyHandle:'@iamreneemarino',replyWhen:'5 days ago',replyLikes:'',
+  reply:'Exactly! ❤️ Why wait for a tragedy to remind us how much we need each other? Every little act of kindness matters.'},
+
+ {id:'yt-thread-rules',kind:'yt-thread',platform:'youtube',
+  author:'Kate Thayer',handle:'@katethayer4633',when:'4 months ago',
+  body:'I can think of a few people, especially in my workplace, who could benefit from these five rules of engagement.',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'4 months ago',replyLikes:'',
+  reply:'Wow thank you so much for sharing, because what you mentioned is so common and happens to us all the time in conversations! 🫶'},
+
+ {id:'yt-thread-family',kind:'yt-thread',platform:'youtube',
+  author:'Majo B',handle:'@majob2363',when:'3 weeks ago',
+  body:'Beautiful family & friends 🎉🎉🎉',likes:'',
+  replyHandle:'@iamreneemarino',replyWhen:'1 day ago',replyLikes:'',
+  reply:'Thank you!! ❤️ They really are! So grateful for the beautiful people and moments that remind us what connection is all about. 🎉🥰'},
+
+ {id:'yt-thread-fun',kind:'yt-thread',platform:'youtube',
+  author:'Hypa',handle:'@Hypaisalittleweirdo',when:'3 weeks ago',
+  body:'That seems like fun',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'1 day ago',replyLikes:'',
+  reply:'It is!! 😂❤️ Life is too short not to have a little fun… especially when dessert is involved! 🍪💃🏻'},
+
+ /* Top comments on the 3.07M-view video. She did not reply to these —
+    they are the audience's own response, and the like counts are the point. */
+ {id:'yt-top-writing',kind:'yt-comment',platform:'youtube',
+  author:'McDimples5933',handle:'@McDimples5933',when:'6 months ago',
+  body:'The act of physically writing things down connects something in the brain',
+  likes:'7.4K',replies:'255 replies'},
+
+ {id:'yt-top-teacher',kind:'yt-comment',platform:'youtube',
+  author:'Rusty77777',handle:'@Rusty77777',when:'6 months ago',
+  body:'I was a high school teacher and I agree. A pen and paper is all that is needed.',
+  likes:'3.5K',replies:'89 replies'},
+
+ {id:'yt-top-remember',kind:'yt-comment',platform:'youtube',
+  author:'rld1278',handle:'@rld1278',when:'6 months ago',
+  body:'The act of writing things down by hand helps the brain remember. This is another aspect of it. Hear it, see it, write it.',
+  likes:'959',replies:'17 replies'},
+
+ {id:'yt-top-itmanager',kind:'yt-comment',platform:'youtube',
+  author:'Chewybond',handle:'@Chewybond',when:'6 months ago',
+  body:'I am an IT manager... for a school... married to a teacher... with four kids of my own in school... Everything he said is 100% facts!',
+  likes:'809',replies:'12 replies'},
+
+ {id:'yt-top-handshake',kind:'yt-comment',platform:'youtube',
+  author:'jamesr1703',handle:'@jamesr1703',when:'5 months ago',
+  body:'I remember when my parents had dinner parties. I was told to make an appearance, to go around the room and shake everyone’s hand and introduce myself. I was 7 years old.',
+  likes:'305',replies:'11 replies'},
+
+ {id:'yt-top-retired',kind:'yt-comment',platform:'youtube',
+  author:'heatherwilfert6962',handle:'@heatherwilfert6962',when:'5 months ago',
+  body:'Im a retired teacher and have been pointing this out for a long time. Kids today are plugged in constantly 😢',
+  likes:'183',replies:'16 replies'},
+
+ /* More of her own replies. */
+ {id:'yt-thread-hug',kind:'yt-thread',platform:'youtube',
+  author:'LABHA HALDER',handle:'@LABHA_HALDER',when:'10 days ago',
+  body:'Hiii ❤ I am the first pleaseeee can I get pin?',likes:'2',
+  replyHandle:'@iamreneemarino',replyWhen:'4 days ago',replyLikes:'',
+  reply:'Hiiii!! 😂❤️ You’re here early! Sending you a big hug! 🥰 Sure!'},
+
+ {id:'yt-thread-welcome',kind:'yt-thread',platform:'youtube',
+  author:'KMC quickTips',handle:'@KMCquickTips',when:'10 days ago',
+  body:'Thank you',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'4 days ago',replyLikes:'',
+  reply:'You’re so welcome! ❤️ Sending you lots of love! 🥰'},
+
+ {id:'yt-thread-love',kind:'yt-thread',platform:'youtube',
+  author:'Riding the Trauma Train',handle:'@ridingthetraumatrain',when:'3 weeks ago',
+  body:'Absolutely love this ❤',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'3 weeks ago',replyLikes:'',
+  reply:'Thank you so much!!! 😊'},
+
+ {id:'yt-thread-dessert',kind:'yt-thread',platform:'youtube',
+  author:'Kate Thayer',handle:'@katethayer4633',when:'3 weeks ago',
+  body:'I just checked my blood sugar after watching this a few times. 😍😋❤️👍',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'3 days ago',replyLikes:'',
+  reply:'Hahaha!! 😂❤️ I’m taking that as a sign you need to try them! Life is too short to skip the dessert. 😋🍪💃🏻'}
+];
+/* Cards that can carry the creator-heart marker. */
+window.HEARTABLE=function(c){return c.kind==='yt-comment'||c.kind==='yt-thread';};
+window.BASE=BASE; window.THEMES=['light','dark'];
+
+var HEARTNOTE='<b>The heart is yours to verify.</b> YouTube does not expose which comments a creator hearted through any API, so every card ships with it off. Turn it on only where Renée really hearted the comment — or have her heart it, which takes one tap and makes the screenshot true.';
+var THREADNOTE='<b>Both sides are real.</b> The comment and Renée’s reply are verbatim from the public thread. Obvious typos are corrected and long comments trimmed to fit — nothing substantive changed, no wording invented.';
+var NOTES={
+ 'li-impressions':'<b>Intentionally blank.</b> LinkedIn shows impressions only to the account owner, so there was nothing to read. Get it from LinkedIn → Me → Posts &amp; Activity → Analytics, type it in, and set the range.',
+ 'li-profile':'<b>5,093 is real but four months old</b> — from the May 2026 dashboard. Check her live profile and update if it has moved.',
+ 'yt-channel':'Relative times on comment cards are as of 21 Sep 2026. If you cut the video much later, nudge them.'
+};
+
+/* ============ app ============ */
+var KEY='marinoShotsV1', AVKEY='marinoAvatarV1';
+var cards=JSON.parse(JSON.stringify(BASE)), theme='light', selected=cards[0].id;
+function cur(){return cards.filter(function(c){return c.id===selected;})[0];}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY)||'{}');
+  cards.forEach(function(c){if(s[c.id])Object.keys(s[c.id]).forEach(function(k){c[k]=s[c.id][k];});});}catch(e){}}
+function save(){try{var o={};cards.forEach(function(c){
+  var b=BASE.filter(function(z){return z.id===c.id;})[0],d={};
+  Object.keys(c).forEach(function(k){if(k!=='id'&&k!=='kind'&&k!=='platform'&&c[k]!==b[k])d[k]=c[k];});
+  if(Object.keys(d).length)o[c.id]=d;});
+  localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
+function applyAvatar(u,persist){var i=new Image();
+  i.onload=function(){AVATAR=i;renderFields();paint();};i.onerror=function(){AVATAR=null;};i.src=u;
+  if(persist){try{localStorage.setItem(AVKEY,u);}catch(e){}}}
+function loadAvatar(){try{var d=localStorage.getItem(AVKEY);if(d)applyAvatar(d,false);}catch(e){}}
+
+var listEl=document.getElementById('list'),fieldsEl=document.getElementById('fields'),
+    noteEl=document.getElementById('note'),cv=document.getElementById('preview'),
+    metaEl=document.getElementById('stagemeta');
+
+function renderList(){listEl.innerHTML='';
+  cards.forEach(function(c){var b=document.createElement('button');
+    b.setAttribute('aria-current',c.id===selected?'true':'false');
+    var blank=c.kind==='li-analytics'&&!(c.value&&String(c.value).trim());
+    b.innerHTML='<span class="dot" style="background:'+PLATDOT[c.platform]+'"></span>'+
+                '<span class="nm">'+c.id+'</span>'+(blank?'<span class="tag">blank</span>':'');
+    b.onclick=function(){selected=c.id;renderList();renderFields();paint();};
+    listEl.appendChild(b);});}
+
+function field(k,label,multi,hint){var c=cur();if(c[k]===undefined)return;
+  var w=document.createElement('div'),el=document.createElement(multi?'textarea':'input');
+  el.id='f-'+k;el.value=c[k];if(multi)el.rows=3;
+  el.oninput=function(){c[k]=el.value;save();paint();};
+  var l=document.createElement('label');l.htmlFor=el.id;l.textContent=label;
+  w.appendChild(l);w.appendChild(el);
+  if(hint){var h=document.createElement('div');h.className='hint';h.textContent=hint;w.appendChild(h);}
+  fieldsEl.appendChild(w);}
+
+function heartField(){
+  var c=cur(); if(!window.HEARTABLE(c)) return;
+  var w=document.createElement('div');
+  var l=document.createElement('label');l.htmlFor='f-heart';l.textContent='Hearted by Renée';
+  var row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;gap:9px';
+  var i=document.createElement('input');
+  i.type='checkbox';i.id='f-heart';i.checked=!!c.hearted;
+  i.style.cssText='width:auto;margin:0';
+  i.onchange=function(){c.hearted=i.checked;save();paint();};
+  var t=document.createElement('span');
+  t.style.cssText='font-size:13px';t.textContent='Show the heart marker';
+  row.appendChild(i);row.appendChild(t);
+  w.appendChild(l);w.appendChild(row);
+  var h=document.createElement('div');h.className='hint';
+  h.textContent='Only turn this on for comments she actually hearted — it is not readable from any API.';
+  w.appendChild(h);
+  fieldsEl.appendChild(w);
+}
+
+function avatarField(){var w=document.createElement('div');
+  var l=document.createElement('label');l.htmlFor='f-av';l.textContent='Renée’s photo';
+  var i=document.createElement('input');i.type='file';i.id='f-av';i.accept='image/*';
+  i.onchange=function(){var fl=i.files&&i.files[0];if(!fl)return;
+    var r=new FileReader();r.onload=function(){applyAvatar(String(r.result),true);};r.readAsDataURL(fl);};
+  w.appendChild(l);w.appendChild(i);
+  var h=document.createElement('div');h.className='hint';
+  h.textContent=AVATAR?'Loaded — used on every card.':'Without one, avatars use an initial.';
+  w.appendChild(h);
+  if(AVATAR){var b=document.createElement('button');b.className='btn ghost';b.textContent='Remove photo';
+    b.style.marginTop='8px';b.onclick=function(){AVATAR=null;try{localStorage.removeItem(AVKEY);}catch(e){}
+    renderFields();paint();};w.appendChild(b);}
+  fieldsEl.appendChild(w);}
+
+function renderFields(){var c=cur();fieldsEl.innerHTML='';
+  field('title','Title');field('name','Name');field('handle','Handle');
+  field('headline','Headline',true);field('bio','Bio',true);field('link','Link');
+  field('author','Commenter');field('when','Posted');
+  field('body',c.kind==='yt-thread'?'Their comment':'Comment',true);
+  field('likes','Likes');
+  field('reply','Renée’s reply',true,'Verbatim from the thread.');
+  field('replyWhen','Reply posted');field('replyLikes','Reply likes');
+  field('views','Views');field('comments','Comments');field('subs','Subscribers');field('videos','Videos');
+  field('posts','Posts');field('followers','Followers');field('following','Following');
+  field('range','Range');field('value','Figure',false,c.kind==='li-analytics'?'Leave empty to keep the blank slot.':'');
+  field('label','Metric label');field('foot','Footnote');field('location','Location');
+  field('replies','Reply count');
+  heartField();
+  avatarField();
+  var n=NOTES[c.id]||(c.kind==='yt-thread'?THREADNOTE:(window.HEARTABLE(c)?HEARTNOTE:null));
+  if(n){noteEl.hidden=false;noteEl.innerHTML=n;}else noteEl.hidden=true;}
+
+function paint(){var out=renderCard(cur(),theme);
+  cv.width=out.width;cv.height=out.height;
+  cv.getContext('2d').drawImage(out,0,0);
+  metaEl.textContent=out.width+' × '+out.height+' · '+cur().platform+' · '+theme+' · transparent PNG';}
+
+function setTheme(t){theme=t;
+  document.getElementById('th-light').setAttribute('aria-pressed',String(t==='light'));
+  document.getElementById('th-dark').setAttribute('aria-pressed',String(t==='dark'));
+  paint();}
+document.getElementById('th-light').onclick=function(){setTheme('light');};
+document.getElementById('th-dark').onclick=function(){setTheme('dark');};
+
+function download(card,th){return new Promise(function(res){
+  renderCard(card,th).toBlob(function(b){
+    var u=URL.createObjectURL(b),a=document.createElement('a');
+    a.href=u;a.download='marino-'+card.id+'-'+th+'.png';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(u);res();},400);},'image/png');});}
+document.getElementById('dl').onclick=function(){download(cur(),theme);};
+document.getElementById('dlall').onclick=async function(){
+  var b=this,t=b.textContent;b.disabled=true;
+  for(var i=0;i<cards.length;i++){b.textContent='Downloading '+(i+1)+' / '+cards.length;
+    await download(cards[i],'light');await download(cards[i],'dark');}
+  b.textContent=t;b.disabled=false;};
+document.getElementById('reset').onclick=function(){
+  cards=JSON.parse(JSON.stringify(BASE));try{localStorage.removeItem(KEY);}catch(e){}
+  renderList();renderFields();paint();};
+
+load();loadAvatar();renderList();renderFields();
+if(document.fonts&&document.fonts.ready){
+  Promise.all(['400 31px Roboto','500 27px Roboto','700 40px Roboto',
+               '400 29px Inter','600 30px Inter','700 42px "Source Sans 3"',
+               '400 28px "Source Sans 3"','600 27px "Source Sans 3"'
+              ].map(function(s){return document.fonts.load(s);}))
+    .then(function(){return document.fonts.ready;}).then(paint).catch(paint);
+}
+paint();
+</script>
