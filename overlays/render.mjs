@@ -32,41 +32,40 @@ await page.goto(pathToFileURL(resolve(here, 'studio.html')).href, { waitUntil: '
 // silently falls back to Times and every measurement shifts.
 await page.evaluate(async () => {
   await Promise.all([
-    document.fonts.load('900 176px Fraunces'),
-    document.fonts.load('700 33px Fraunces'),
-    document.fonts.load('600 26px Archivo'),
-    document.fonts.load('500 38px Archivo'),
-    document.fonts.load('400 40px Archivo'),
-    document.fonts.load('700 32px Archivo'),
+    document.fonts.load('400 31px Roboto'),
+    document.fonts.load('500 27px Roboto'),
+    document.fonts.load('700 40px Roboto'),
+    document.fonts.load('400 29px Inter'),
+    document.fonts.load('600 30px Inter'),
+    document.fonts.load('700 42px "Source Sans 3"'),
+    document.fonts.load('400 28px "Source Sans 3"'),
   ]);
   await document.fonts.ready;
 });
 
-const fraunces = await page.evaluate(() => document.fonts.check('900 176px Fraunces'));
-const archivo = await page.evaluate(() => document.fonts.check('600 26px Archivo'));
-if (!fraunces || !archivo) {
-  console.warn(`! webfont missing (Fraunces=${fraunces} Archivo=${archivo}) — cards will render in a fallback face`);
+const seen = await page.evaluate(() => ({
+  roboto: document.fonts.check('400 31px Roboto'),
+  inter: document.fonts.check('400 29px Inter'),
+  source: document.fonts.check('400 28px "Source Sans 3"'),
+}));
+if (!seen.roboto || !seen.inter || !seen.source) {
+  console.warn('! webfont missing — cards will render in a fallback face', seen);
 }
 
 const cards = await page.evaluate(() => window.BASE.map((c) => c.id));
-const formats = await page.evaluate(() => Object.keys(window.FORMATS));
+const themes = await page.evaluate(() => window.THEMES);
 
 let written = 0;
 for (const id of cards) {
-  for (const fmt of formats) {
+  for (const theme of themes) {
     const dataUrl = await page.evaluate(
-      ([cardId, fmtKey]) => {
+      ([cardId, th]) => {
         const card = window.BASE.find((c) => c.id === cardId);
-        const fm = window.FORMATS[fmtKey];
-        const cv = document.createElement('canvas');
-        cv.width = fm.w;
-        cv.height = fm.h;
-        window.drawCard(cv.getContext('2d'), card, fm);
-        return cv.toDataURL('image/png');
+        return window.renderCard(card, th).toDataURL('image/png');
       },
-      [id, fmt],
+      [id, theme],
     );
-    const file = resolve(outDir, `marino-${id}-${fmt}.png`);
+    const file = resolve(outDir, `marino-${id}-${theme}.png`);
     await writeFile(file, Buffer.from(dataUrl.split(',')[1], 'base64'));
     written++;
   }

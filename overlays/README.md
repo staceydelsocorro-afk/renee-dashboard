@@ -1,69 +1,85 @@
-# Renée Marino — Video Stat Overlays
+# Renée Marino — Screenshot Cards
 
-Transparent-PNG stat cards and comment cards, sized for video, built from her real
-numbers so they can be dropped straight onto a timeline.
+Post, profile and comment screenshots rebuilt in each platform's own interface and
+typeface, carrying her real figures and real comments. Transparent PNGs, sized to
+scale and place over video.
 
 ## What's in `out/`
 
-Every card renders at two sizes, with a fully transparent background:
+17 cards, each rendered in both interface themes:
 
-- `*-vertical.png` — 1080 × 1920 (Reels, Shorts, TikTok). Card sits in the middle
-  third; the top 240px and bottom 470px are left clear of platform UI chrome.
-- `*-horizontal.png` — 1920 × 1080 (YouTube long-form). Card sits lower-left.
+- `*-light.png` — light interface
+- `*-dark.png` — dark interface
 
-Drop the PNG on a track above the footage. No keying, no masking — the alpha is
-already cut.
+Each PNG is its natural card size (1080px wide, height set by content) on a
+transparent background with a soft drop shadow already cut in. Drop one on a track
+above the footage and scale it to taste — no keying, no masking.
+
+## Typefaces
+
+Each card uses the typeface the platform actually renders in:
+
+| Platform | Typeface |
+|---|---|
+| LinkedIn | Source Sans 3 — LinkedIn's own face |
+| YouTube | Roboto — YouTube's own face |
+| Instagram | Inter — closest open substitute for Instagram Sans / SF Pro, which are not licensable |
+
+## Every card stays on its own platform
+
+Her comments are real YouTube comments, so they render in YouTube's comment UI.
+Putting them in LinkedIn or Instagram chrome would attribute real people's words to
+a platform they never posted on. LinkedIn chrome carries the LinkedIn figures,
+Instagram chrome the Instagram ones.
 
 ## Where every number comes from
 
 | Card | Figure | Source | As of |
 |---|---|---|---|
-| `peak-views` | 3,077,079 views | YouTube, video `0RVqSBisvHU` | 21 Sep 2026 |
-| `peak-likes` | 184,671 likes | YouTube, video `0RVqSBisvHU` | 21 Sep 2026 |
-| `peak-comments` | 11,042 comments | YouTube, video `0RVqSBisvHU` | 21 Sep 2026 |
-| `yt-lifetime` | 3,239,159 views | YouTube channel `UCsSkET6muRFdrKhnW2yyr7g` | 21 Sep 2026 |
-| `yt-subs` | 15,200 subscribers | YouTube channel | 21 Sep 2026 |
-| `ig-followers` | 23.4K followers | Instagram `@iamreneemarino` | 21 Sep 2026 |
-| `li-followers` | 5,093 followers | Dashboard `index.html` | May 2026 |
+| `yt-video` | 3,077,079 views · 184,671 likes · 11,042 comments | YouTube, video `0RVqSBisvHU` | 21 Sep 2026 |
+| `yt-channel` | 15.2K subscribers · 297 videos · 3,239,159 views | YouTube channel `UCsSkET6muRFdrKhnW2yyr7g` | 21 Sep 2026 |
+| `ig-profile` | 2.4K posts · 23.4K followers · 3.2K following | Instagram `@iamreneemarino` | 21 Sep 2026 |
+| `li-profile` | 5,093 followers | Dashboard `index.html` | May 2026 |
 | `li-impressions` | *blank template* | **not sourced — see below** | — |
-| `audience-rank` | 5-platform stack | mixed, per row | per row |
-| `comment-*` | verbatim | YouTube public comments | date on card |
-| `thread-*` | verbatim, both sides | YouTube public threads | date on card |
+| `yt-comment-*` | verbatim | public YouTube comments | relative to 21 Sep 2026 |
+| `yt-thread-*` | verbatim, both sides | public YouTube threads | relative to 21 Sep 2026 |
 
-**Comment cards** (`comment-*`) show one audience comment, with the commenter's real
-handle.
+`yt-thread-*` cards show the exchange: the comment, then Renée's actual reply with
+her handle in YouTube's channel-owner pill. Both halves come from the public thread.
+Obvious typos are corrected and long comments trimmed to fit; nothing substantive is
+changed and no wording is invented.
 
-**Reply cards** (`thread-*`) show the exchange: the comment, then Renée's actual reply
-beneath it, marked `CREATOR`. Both halves are taken from the public thread.
-
-On both, obvious typos are corrected and long comments trimmed to fit the frame.
-Nothing substantive is changed and no wording is invented — if a line is on a card,
-someone really wrote it.
-
-Her replies use an “R” monogram by default. To use her headshot instead, open
-`studio.html`, pick any `thread-*` card, and choose a file under **Renée's photo**;
-it applies to every reply card and is remembered in that browser.
+Timestamps read as relative ages ("2 weeks ago") anchored to 21 Sep 2026. If the
+video is cut much later than that, nudge them in `studio.html`.
 
 ## The one number that isn't here
 
-**LinkedIn impressions.** LinkedIn only exposes post and follower analytics to the
-account owner, and this repo has no LinkedIn connection — so there was nothing to
-read. `li-impressions` ships as a clearly-marked blank template rather than a guess.
+**LinkedIn impressions.** LinkedIn exposes impression analytics only to the account
+owner, and this repo has no LinkedIn connection — so there was nothing to read.
+`li-impressions` ships as a visibly marked blank template rather than a guess, since
+a fabricated figure in a real-looking analytics panel is the one thing these cards
+must never carry.
+
+Fill it from **LinkedIn → Me → Posts & Activity → Analytics → Impressions**: open
+`studio.html`, pick the card, type the figure, set the range, download.
 
 The LinkedIn follower count (5,093) is real but dates from the May 2026 dashboard
-snapshot, so it is labelled with that date on the card.
+snapshot. Instagram moved 18,400 → 23.4K over the same period, so it is worth
+re-checking against her live profile.
 
-To fill either one: open `studio.html`, pick the card, type the figure from
-**LinkedIn → Me → Posts & Activity → Analytics → Impressions**, and download.
+## Avatars
+
+Her profile photo host is blocked by this environment's network policy, so avatars
+fall back to an initial. `studio.html` takes a headshot through a file picker under
+**Renée's photo**; it applies to every card and is remembered in that browser.
 
 ## studio.html
 
 Open it in a browser — locally, or via GitHub Pages at `/overlays/studio.html`.
 
-- Edit any card's figures, labels, comment text and replies
-- Drop in Renée's headshot for the reply cards
-- Toggle vertical / horizontal
-- Download a single card, or the whole set, as transparent PNGs
+- Edit any figure, name, timestamp, comment or reply
+- Switch between light and dark interface
+- Download one card, or the whole set in both themes
 - Edits persist in the browser; **Reset** restores the verified values
 
 ## Re-rendering the batch
@@ -73,4 +89,4 @@ npm install playwright
 node overlays/render.mjs
 ```
 
-Writes every card, both formats, to `overlays/out/`.
+Writes every card, both themes, to `overlays/out/`.
