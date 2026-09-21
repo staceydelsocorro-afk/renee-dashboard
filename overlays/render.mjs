@@ -57,17 +57,28 @@ const themes = await page.evaluate(() => window.THEMES);
 
 let written = 0;
 for (const id of cards) {
+  // Comment cards render twice: plain, and with the creator-heart marker. Which
+  // comments Renée actually hearted is not readable from any API, so both states
+  // ship and the true one gets picked by hand.
+  const heartable = await page.evaluate(
+    (cardId) => window.HEARTABLE(window.BASE.find((c) => c.id === cardId)),
+    id,
+  );
+  const variants = heartable ? [false, true] : [false];
+
   for (const theme of themes) {
-    const dataUrl = await page.evaluate(
-      ([cardId, th]) => {
-        const card = window.BASE.find((c) => c.id === cardId);
-        return window.renderCard(card, th).toDataURL('image/png');
-      },
-      [id, theme],
-    );
-    const file = resolve(outDir, `marino-${id}-${theme}.png`);
-    await writeFile(file, Buffer.from(dataUrl.split(',')[1], 'base64'));
-    written++;
+    for (const hearted of variants) {
+      const dataUrl = await page.evaluate(
+        ([cardId, th, hrt]) => {
+          const card = { ...window.BASE.find((c) => c.id === cardId), hearted: hrt };
+          return window.renderCard(card, th).toDataURL('image/png');
+        },
+        [id, theme, hearted],
+      );
+      const name = `marino-${id}${hearted ? '-hearted' : ''}-${theme}.png`;
+      await writeFile(resolve(outDir, name), Buffer.from(dataUrl.split(',')[1], 'base64'));
+      written++;
+    }
   }
 }
 

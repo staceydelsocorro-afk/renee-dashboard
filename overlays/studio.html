@@ -135,12 +135,13 @@ function wrap(c,t,maxW){
   if(cur)lines.push(cur);return lines;}
 function lines(c,arr,x,y,lh,size){for(var i=0;i<arr.length;i++)c.fillText(arr[i],x,y+lh*i+size*0.78);return arr.length*lh;}
 
-function avatar(c,x,y,s,name,T){
+var CREATOR_FILL='#C2612B';
+function avatar(c,x,y,s,name,T,forceFill){
   var has=AVATAR&&AVATAR.complete&&AVATAR.naturalWidth>0;
   c.save();c.beginPath();c.arc(x+s/2,y+s/2,s/2,0,Math.PI*2);c.closePath();c.clip();
   if(has)c.drawImage(AVATAR,x,y,s,s);
   else{var pal=['#B4886B','#8E9E7A','#A67C8E','#7B8FA3','#B39256','#89806F'];
-       c.fillStyle=pal[(name?name.charCodeAt(0):0)%pal.length];c.fillRect(x,y,s,s);}
+       c.fillStyle=forceFill||pal[(name?name.charCodeAt(0):0)%pal.length];c.fillRect(x,y,s,s);}
   c.restore();
   if(!has){c.save();c.font=f(500,Math.round(s*0.42),'Inter, sans-serif');c.fillStyle='rgba(255,255,255,0.95)';
     c.textAlign='center';c.fillText((name||'?').replace(/^@/,'').charAt(0).toUpperCase(),x+s/2,y+s/2+s*0.15);
@@ -214,6 +215,32 @@ function dots(c,x,y,s,col){
   for(var i=0;i<3;i++){c.beginPath();c.arc(x+s*0.5,y+s*(0.18+i*0.32),s*0.085,0,Math.PI*2);c.fill();}
   c.restore();
 }
+/* YouTube's "hearted by creator" marker: the creator's avatar as a small badge
+   on the commenter's avatar, with a red heart on its corner. */
+function heartBadge(c,x,y,av,T){
+  var bs=Math.round(av*0.46), bx=x+av-bs*0.86, by=y+av-bs*0.86;
+  var has=AVATAR&&AVATAR.complete&&AVATAR.naturalWidth>0;
+  c.save();
+  c.beginPath();c.arc(bx+bs/2,by+bs/2,bs/2+Math.round(bs*0.09),0,Math.PI*2);c.closePath();
+  c.fillStyle=T.bg;c.fill();
+  c.restore();
+  c.save();
+  c.beginPath();c.arc(bx+bs/2,by+bs/2,bs/2,0,Math.PI*2);c.closePath();c.clip();
+  if(has)c.drawImage(AVATAR,bx,by,bs,bs);
+  else{c.fillStyle='#C2612B';c.fillRect(bx,by,bs,bs);}
+  c.restore();
+  if(!has){
+    c.save();c.font=f(600,Math.round(bs*0.52),'Inter, sans-serif');
+    c.fillStyle='#FFF';c.textAlign='center';
+    c.fillText('R',bx+bs/2-bs*0.04,by+bs/2+bs*0.17);c.textAlign='left';c.restore();
+  }
+  var hs=Math.round(bs*0.58), hx=bx+bs-hs*0.46, hy=by+bs-hs*0.54;
+  c.save();
+  c.beginPath();c.arc(hx+hs/2,hy+hs/2,hs*0.72,0,Math.PI*2);c.closePath();
+  c.fillStyle=T.bg;c.fill();c.restore();
+  heartIcon(c,hx,hy,hs,'#FF0033',true);
+}
+
 function pillBtn(c,x,y,w,h,fill,label,labelCol,fam,size){
   c.save();c.fillStyle=fill;rr(c,x,y,w,h,h/2);c.fill();
   c.font=f(600,size,fam);c.fillStyle=labelCol;c.textAlign='center';
@@ -228,7 +255,8 @@ function outlineBtn(c,x,y,w,h,col,label,fam,size){
 /* ============ card drawers — each returns the content height ============ */
 function dYtComment(c,d,T,F,indent,small){
   var x=PAD+indent, w=W-PAD*2-indent, y=PAD, av=small?58:76, gap=small?20:24;
-  avatar(c,x,y,av,d.author,T);
+  avatar(c,x,y,av,d.author,T,d.creator?CREATOR_FILL:null);
+  if(d.hearted) heartBadge(c,x,y,av,T);
   var tx=x+av+gap, tw=w-av-gap;
   var nameS=small?25:27;
   c.font=f(500,nameS,F); 
@@ -258,11 +286,26 @@ function dYtComment(c,d,T,F,indent,small){
   thumbUp(c,tx+ic+lw+34,y,ic,T.sub,true);
   c.font=f(500,small?23:25,F);c.fillStyle=T.sub;
   c.fillText('Reply',tx+ic*2+lw+82,y+ic*0.74);
-  return y+ic+ (small?4:8) - PAD;
+  if(d.hearted){
+    var rhx=tx+ic*2+lw+82+c.measureText('Reply').width+Math.round(30);
+    heartIcon(c,rhx,y+Math.round(ic*0.10),Math.round(ic*0.80),'#FF0033',true);
+  }
+  y+=ic+(small?4:8);
+  if(d.replies){
+    y+=14;
+    c.save();c.fillStyle=T.accent;
+    c.beginPath();
+    c.moveTo(tx+4,y+8);c.lineTo(tx+20,y+18);c.lineTo(tx+4,y+28);c.closePath();c.fill();
+    c.font=f(500,small?23:25,F);
+    c.fillText(d.replies,tx+34,y+26);c.restore();
+    y+=36;
+  }
+  return y-PAD;
 }
 
 function dYtThread(c,d,T,F){
-  var h=dYtComment(c,{author:d.author,handle:d.handle,when:d.when,body:d.body,likes:d.likes},T,F,0,false);
+  var h=dYtComment(c,{author:d.author,handle:d.handle,when:d.when,body:d.body,
+                      likes:d.likes,hearted:d.hearted},T,F,0,false);
   var y=PAD+h+26;
   /* creator reply, indented under the comment */
   var saveY=PAD;
@@ -494,10 +537,70 @@ var BASE=[
   author:'Hypa',handle:'@Hypaisalittleweirdo',when:'3 weeks ago',
   body:'That seems like fun',likes:'1',
   replyHandle:'@iamreneemarino',replyWhen:'1 day ago',replyLikes:'',
-  reply:'It is!! 😂❤️ Life is too short not to have a little fun… especially when dessert is involved! 🍪💃🏻'}
+  reply:'It is!! 😂❤️ Life is too short not to have a little fun… especially when dessert is involved! 🍪💃🏻'},
+
+ /* Top comments on the 3.07M-view video. She did not reply to these —
+    they are the audience's own response, and the like counts are the point. */
+ {id:'yt-top-writing',kind:'yt-comment',platform:'youtube',
+  author:'McDimples5933',handle:'@McDimples5933',when:'6 months ago',
+  body:'The act of physically writing things down connects something in the brain',
+  likes:'7.4K',replies:'255 replies'},
+
+ {id:'yt-top-teacher',kind:'yt-comment',platform:'youtube',
+  author:'Rusty77777',handle:'@Rusty77777',when:'6 months ago',
+  body:'I was a high school teacher and I agree. A pen and paper is all that is needed.',
+  likes:'3.5K',replies:'89 replies'},
+
+ {id:'yt-top-remember',kind:'yt-comment',platform:'youtube',
+  author:'rld1278',handle:'@rld1278',when:'6 months ago',
+  body:'The act of writing things down by hand helps the brain remember. This is another aspect of it. Hear it, see it, write it.',
+  likes:'959',replies:'17 replies'},
+
+ {id:'yt-top-itmanager',kind:'yt-comment',platform:'youtube',
+  author:'Chewybond',handle:'@Chewybond',when:'6 months ago',
+  body:'I am an IT manager... for a school... married to a teacher... with four kids of my own in school... Everything he said is 100% facts!',
+  likes:'809',replies:'12 replies'},
+
+ {id:'yt-top-handshake',kind:'yt-comment',platform:'youtube',
+  author:'jamesr1703',handle:'@jamesr1703',when:'5 months ago',
+  body:'I remember when my parents had dinner parties. I was told to make an appearance, to go around the room and shake everyone’s hand and introduce myself. I was 7 years old.',
+  likes:'305',replies:'11 replies'},
+
+ {id:'yt-top-retired',kind:'yt-comment',platform:'youtube',
+  author:'heatherwilfert6962',handle:'@heatherwilfert6962',when:'5 months ago',
+  body:'Im a retired teacher and have been pointing this out for a long time. Kids today are plugged in constantly 😢',
+  likes:'183',replies:'16 replies'},
+
+ /* More of her own replies. */
+ {id:'yt-thread-hug',kind:'yt-thread',platform:'youtube',
+  author:'LABHA HALDER',handle:'@LABHA_HALDER',when:'10 days ago',
+  body:'Hiii ❤ I am the first pleaseeee can I get pin?',likes:'2',
+  replyHandle:'@iamreneemarino',replyWhen:'4 days ago',replyLikes:'',
+  reply:'Hiiii!! 😂❤️ You’re here early! Sending you a big hug! 🥰 Sure!'},
+
+ {id:'yt-thread-welcome',kind:'yt-thread',platform:'youtube',
+  author:'KMC quickTips',handle:'@KMCquickTips',when:'10 days ago',
+  body:'Thank you',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'4 days ago',replyLikes:'',
+  reply:'You’re so welcome! ❤️ Sending you lots of love! 🥰'},
+
+ {id:'yt-thread-love',kind:'yt-thread',platform:'youtube',
+  author:'Riding the Trauma Train',handle:'@ridingthetraumatrain',when:'3 weeks ago',
+  body:'Absolutely love this ❤',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'3 weeks ago',replyLikes:'',
+  reply:'Thank you so much!!! 😊'},
+
+ {id:'yt-thread-dessert',kind:'yt-thread',platform:'youtube',
+  author:'Kate Thayer',handle:'@katethayer4633',when:'3 weeks ago',
+  body:'I just checked my blood sugar after watching this a few times. 😍😋❤️👍',likes:'1',
+  replyHandle:'@iamreneemarino',replyWhen:'3 days ago',replyLikes:'',
+  reply:'Hahaha!! 😂❤️ I’m taking that as a sign you need to try them! Life is too short to skip the dessert. 😋🍪💃🏻'}
 ];
+/* Cards that can carry the creator-heart marker. */
+window.HEARTABLE=function(c){return c.kind==='yt-comment'||c.kind==='yt-thread';};
 window.BASE=BASE; window.THEMES=['light','dark'];
 
+var HEARTNOTE='<b>The heart is yours to verify.</b> YouTube does not expose which comments a creator hearted through any API, so every card ships with it off. Turn it on only where Renée really hearted the comment — or have her heart it, which takes one tap and makes the screenshot true.';
 var THREADNOTE='<b>Both sides are real.</b> The comment and Renée’s reply are verbatim from the public thread. Obvious typos are corrected and long comments trimmed to fit — nothing substantive changed, no wording invented.';
 var NOTES={
  'li-impressions':'<b>Intentionally blank.</b> LinkedIn shows impressions only to the account owner, so there was nothing to read. Get it from LinkedIn → Me → Posts &amp; Activity → Analytics, type it in, and set the range.',
@@ -543,6 +646,26 @@ function field(k,label,multi,hint){var c=cur();if(c[k]===undefined)return;
   if(hint){var h=document.createElement('div');h.className='hint';h.textContent=hint;w.appendChild(h);}
   fieldsEl.appendChild(w);}
 
+function heartField(){
+  var c=cur(); if(!window.HEARTABLE(c)) return;
+  var w=document.createElement('div');
+  var l=document.createElement('label');l.htmlFor='f-heart';l.textContent='Hearted by Renée';
+  var row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;gap:9px';
+  var i=document.createElement('input');
+  i.type='checkbox';i.id='f-heart';i.checked=!!c.hearted;
+  i.style.cssText='width:auto;margin:0';
+  i.onchange=function(){c.hearted=i.checked;save();paint();};
+  var t=document.createElement('span');
+  t.style.cssText='font-size:13px';t.textContent='Show the heart marker';
+  row.appendChild(i);row.appendChild(t);
+  w.appendChild(l);w.appendChild(row);
+  var h=document.createElement('div');h.className='hint';
+  h.textContent='Only turn this on for comments she actually hearted — it is not readable from any API.';
+  w.appendChild(h);
+  fieldsEl.appendChild(w);
+}
+
 function avatarField(){var w=document.createElement('div');
   var l=document.createElement('label');l.htmlFor='f-av';l.textContent='Renée’s photo';
   var i=document.createElement('input');i.type='file';i.id='f-av';i.accept='image/*';
@@ -569,8 +692,10 @@ function renderFields(){var c=cur();fieldsEl.innerHTML='';
   field('posts','Posts');field('followers','Followers');field('following','Following');
   field('range','Range');field('value','Figure',false,c.kind==='li-analytics'?'Leave empty to keep the blank slot.':'');
   field('label','Metric label');field('foot','Footnote');field('location','Location');
+  field('replies','Reply count');
+  heartField();
   avatarField();
-  var n=NOTES[c.id]||(c.kind==='yt-thread'?THREADNOTE:null);
+  var n=NOTES[c.id]||(c.kind==='yt-thread'?THREADNOTE:(window.HEARTABLE(c)?HEARTNOTE:null));
   if(n){noteEl.hidden=false;noteEl.innerHTML=n;}else noteEl.hidden=true;}
 
 function paint(){var out=renderCard(cur(),theme);

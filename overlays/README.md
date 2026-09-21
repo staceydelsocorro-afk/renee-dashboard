@@ -6,10 +6,16 @@ scale and place over video.
 
 ## What's in `out/`
 
-17 cards, each rendered in both interface themes:
+27 cards, each rendered in both interface themes:
 
 - `*-light.png` — light interface
 - `*-dark.png` — dark interface
+
+Comment and reply cards also render with the creator-heart marker:
+
+- `*-hearted-light.png` / `*-hearted-dark.png`
+
+98 files in total.
 
 Each PNG is its natural card size (1080px wide, height set by content) on a
 transparent background with a soft drop shadow already cut in. Drop one on a track
@@ -42,10 +48,33 @@ Instagram chrome the Instagram ones.
 | `li-profile` | 5,093 followers | Dashboard `index.html` | May 2026 |
 | `li-impressions` | *blank template* | **not sourced — see below** | — |
 | `yt-comment-*` | verbatim | public YouTube comments | relative to 21 Sep 2026 |
+| `yt-top-*` | verbatim, 7.4K–183 likes | top comments on video `0RVqSBisvHU` | relative to 21 Sep 2026 |
 | `yt-thread-*` | verbatim, both sides | public YouTube threads | relative to 21 Sep 2026 |
 
-`yt-thread-*` cards show the exchange: the comment, then Renée's actual reply with
-her handle in YouTube's channel-owner pill. Both halves come from the public thread.
+## Three kinds of comment card
+
+`yt-comment-*` — one audience comment with its real like count.
+
+`yt-top-*` — the top comments on the 3.07M-view video, carrying 7.4K, 3.5K and 959
+likes with hundreds of replies. She did **not** reply to these; they are the
+audience's own response and the like counts are the point.
+
+`yt-thread-*` — the exchange: the comment, then Renée's actual reply with her handle
+in YouTube's channel-owner pill. Both halves come from the public thread.
+
+## The heart marker
+
+Every comment and reply card renders twice — once plain, once with YouTube's
+"hearted by creator" marker: her avatar badged on the commenter's avatar, plus the
+red heart in the action row.
+
+**Which comments she actually hearted is not readable from any API**, YouTube's
+included. So nothing is asserted by default. The plain file is the safe one; the
+`-hearted` file is for comments you know she hearted. If you want a hearted
+screenshot of a comment she has not hearted, the honest fix is one tap — have her
+heart it, and the screenshot becomes true.
+
+`studio.html` carries a **Hearted by Renée** checkbox per card for the same choice.
 Obvious typos are corrected and long comments trimmed to fit; nothing substantive is
 changed and no wording is invented.
 
